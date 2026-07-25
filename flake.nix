@@ -15,12 +15,12 @@
     let
       # Version and platform-specific hashes for pre-built binaries.
       # These are updated automatically by CI on each stable release.
-      version = "0.4.0-nas.2";
+      version = "0.4.1";
       hashes = {
-        x86_64-linux = "sha256-8XSyYWkXqXFHCWdhOYxm/O7v0BsgGsfqXw7bkVL5PEQ=";
-        aarch64-linux = "sha256-q+KJzt6M+PbRRaLskkrQaBBOuCBuQu3Vb6u2TYK9bas=";
-        aarch64-darwin = "sha256-V+d86hzCQiR4sXecBnDdyz1GEYsffxcBXpeH5+T3EQA=";
-        x86_64-darwin = "sha256-9DxWHrUkC3vnpYiWbpdYyzCaHNXUEuWXoWur4ntQhs0=";
+        x86_64-linux = "sha256-hSf6DGQ1/wfQjd2lczVAIG//rdegPI6dkY0q1WbrxiI=";
+        aarch64-linux = "sha256-UGLcDOb8TRlsbxBQC1wHOwHZNomlRHqXhV/+qpzvRp8=";
+        aarch64-darwin = "sha256-TTgEtz0Xi5teJRhvPvso2JdWuF0Ko4H0eu/IMm7go3s=";
+        x86_64-darwin = "sha256-I8GACvzsRm14mCUfaGp48V01cQpPg2wxYiEB0OvNPcI=";
       };
 
       # Map Nix system strings to GitHub release artifact suffixes.
