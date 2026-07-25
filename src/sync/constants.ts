@@ -8,8 +8,11 @@
 // Timing Constants
 // ============================================================================
 
-/** Polling interval for processing jobs in watch mode (2 seconds) */
-export const JOB_POLL_INTERVAL_MS = 2_000;
+/** Safety poll while the event-driven processor is idle. */
+export const JOB_IDLE_POLL_INTERVAL_MS = 60_000;
+
+/** Status heartbeat used to confirm that the sync loop is still alive. */
+export const JOB_STATUS_HEARTBEAT_INTERVAL_MS = 30_000;
 
 /** Timeout for graceful shutdown (2 seconds) */
 export const SHUTDOWN_TIMEOUT_MS = 2_000;

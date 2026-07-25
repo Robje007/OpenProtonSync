@@ -3,6 +3,8 @@ import type { DashboardJob, SyncStatus, AuthStatusUpdate } from './types.js';
 import { PauseButton } from './PauseButton.js';
 import { formatPath } from './utils.js';
 import { Icon } from './Icon.js';
+import { formatJobAction } from './utils.js';
+import type { RemoteDeleteBehavior } from '../../../config.js';
 
 type Props = {
   jobs: DashboardJob[];
@@ -10,16 +12,28 @@ type Props = {
   syncStatus: SyncStatus;
   authStatus: AuthStatusUpdate;
   limit: number;
+  deleteBehavior: RemoteDeleteBehavior;
 };
 
-export const ProcessingQueue: FC<Props> = ({ jobs, count, syncStatus, authStatus, limit }) => {
+export const ProcessingQueue: FC<Props> = ({
+  jobs,
+  count,
+  syncStatus,
+  authStatus,
+  limit,
+  deleteBehavior,
+}) => {
   const isPaused = syncStatus === 'paused';
   const isActive = syncStatus === 'syncing' && authStatus.status === 'authenticated';
-  const title = isPaused ? 'Transfers paused' : isActive ? 'Uploading now' : 'Transfers on hold';
+  const title = isPaused
+    ? 'Remote work paused'
+    : isActive
+      ? 'Remote activity'
+      : 'Remote work on hold';
   const subtitle = isPaused
     ? 'Resume sync when you are ready'
     : isActive
-      ? 'Files currently moving to Proton Drive'
+      ? 'Uploads, folder creation and remote deletions in progress'
       : 'Waiting for a connection and authenticated account';
   const statusDot = isPaused || !isActive ? 'bg-amber-500' : 'bg-blue-500 animate-pulse';
   const displayJobs = jobs.slice(0, limit);
@@ -48,7 +62,7 @@ export const ProcessingQueue: FC<Props> = ({ jobs, count, syncStatus, authStatus
         {displayJobs.length === 0 ? (
           <div class="h-full flex flex-col items-center justify-center text-gray-500 space-y-2">
             <Icon name="zap" class="w-10 h-10 opacity-20" />
-            <p class="text-sm font-medium text-slate-400">Nothing uploading right now</p>
+            <p class="text-sm font-medium text-slate-400">No remote operations right now</p>
             <p class="text-xs text-slate-600">New changes will appear here automatically.</p>
           </div>
         ) : (
@@ -65,11 +79,14 @@ export const ProcessingQueue: FC<Props> = ({ jobs, count, syncStatus, authStatus
                     <Icon name="clock" class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
                   )}
                   <div class="min-w-0 flex-1">
+                    <div class="mb-1 text-[10px] font-semibold uppercase tracking-wider text-blue-300">
+                      {formatJobAction(job.eventType, 'active', deleteBehavior)}
+                    </div>
                     <div class="truncate text-xs font-medium text-slate-200">
                       {formatPath(job.localPath)}
                     </div>
                     <div class="mt-1 truncate font-mono text-[10px] text-slate-500">
-                      {job.localPath}
+                      {job.remotePath}
                     </div>
                   </div>
                 </div>

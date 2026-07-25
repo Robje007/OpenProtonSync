@@ -48,8 +48,8 @@
               />
             </span>
             <div class="header-title">
-              <p class="text-sm font-semibold tracking-wide text-white">Proton NAS Sync</p>
-              <p class="text-[11px] text-violet-300/70">Backup cockpit</p>
+              <p class="text-sm font-semibold tracking-wide text-white">Proton Drive Sync</p>
+              <p class="text-[11px] text-violet-300/70">Sync dashboard</p>
             </div>
           </a>
 

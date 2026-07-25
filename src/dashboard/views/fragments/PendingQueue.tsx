@@ -1,6 +1,6 @@
 import type { FC } from 'hono/jsx';
 import type { DashboardJob } from './types.js';
-import { formatPath } from './utils.js';
+import { formatJobAction, formatPath } from './utils.js';
 import { Icon } from './Icon.js';
 
 type Props = {
@@ -21,7 +21,7 @@ export const PendingQueue: FC<Props> = ({ jobs, count, limit }) => {
             <span class="h-2 w-2 rounded-full bg-violet-400"></span>
             Up next
           </h2>
-          <p class="mt-1 text-xs text-slate-500">Ready and waiting for an upload slot</p>
+          <p class="mt-1 text-xs text-slate-500">Remote operations waiting for a worker slot</p>
         </div>
         <div class="flex shrink-0 items-center gap-3">
           <span class="text-[10px] font-medium uppercase tracking-wider text-slate-600">Live</span>
@@ -37,7 +37,7 @@ export const PendingQueue: FC<Props> = ({ jobs, count, limit }) => {
           <div class="h-full flex flex-col items-center justify-center text-gray-500 space-y-2">
             <Icon name="circle-check" class="h-10 w-10 opacity-20" />
             <p class="text-sm font-medium text-slate-400">All caught up</p>
-            <p class="text-xs text-slate-600">There are no files waiting to upload.</p>
+            <p class="text-xs text-slate-600">There are no remote operations waiting.</p>
           </div>
         ) : (
           <div class="space-y-1">
@@ -48,6 +48,9 @@ export const PendingQueue: FC<Props> = ({ jobs, count, limit }) => {
               >
                 <Icon name="clock" class="w-4 h-4 text-amber-500 shrink-0" />
                 <div class="min-w-0 flex-1">
+                  <span class="mb-0.5 block text-[10px] font-semibold uppercase tracking-wider text-violet-300">
+                    {formatJobAction(job.eventType, 'pending')}
+                  </span>
                   <span class="block truncate text-xs font-medium text-slate-300">
                     {formatPath(job.localPath)}
                   </span>

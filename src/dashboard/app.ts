@@ -9,9 +9,9 @@
 
 import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
-import { createReadStream, statSync, watchFile, unwatchFile } from 'fs';
+import { createReadStream, statSync, watch } from 'fs';
 import { createInterface } from 'readline';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { xdgState } from 'xdg-basedir';
 import { EventEmitter } from 'events';
 import {
@@ -277,13 +277,18 @@ function renderStats(counts: {
 }
 
 /** Render processing queue HTML (header with pause button + list) */
-function renderProcessingQueue(jobs: DashboardJob[], count: number): string {
+function renderProcessingQueue(
+  jobs: DashboardJob[],
+  count: number,
+  deleteBehavior: Config['remote_delete_behavior']
+): string {
   return ProcessingQueue({
     jobs,
     count,
     syncStatus: currentSyncStatus,
     authStatus: currentAuthStatus,
     limit: QUEUE_DISPLAY_LIMIT,
+    deleteBehavior,
   })!.toString();
 }
 
@@ -514,7 +519,7 @@ function renderSyncDirsHtml(dirs: Config['sync_dirs']): string {
               onchange="updateSyncDir(${index}, 'sync_mode', this.value)"
               class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-proton"
             >
-              <option value="upload" ${dir.sync_mode !== 'two_way' ? 'selected' : ''}>NAS → Drive</option>
+              <option value="upload" ${dir.sync_mode !== 'two_way' ? 'selected' : ''}>Local → Drive</option>
               <option value="two_way" ${dir.sync_mode === 'two_way' ? 'selected' : ''}>Two-way (beta)</option>
             </select>
           </div>
@@ -594,7 +599,11 @@ export function renderFragment(key: FragmentKey, s: DashboardSnapshot): string {
     case FRAG.stats:
       return renderStats(s.counts);
     case FRAG.processingQueue:
-      return renderProcessingQueue(s.processing, s.counts.processing);
+      return renderProcessingQueue(
+        s.processing,
+        s.counts.processing,
+        s.config?.remote_delete_behavior ?? defaultConfig.remote_delete_behavior
+      );
     case FRAG.blockedQueue:
       return renderBlockedQueue(s.blocked, s.counts.blocked);
     case FRAG.pendingQueue:
@@ -641,7 +650,7 @@ function getWebAuthRequestInfo(request: Request): WebAuthRequestInfo {
     forwardedHost: headers.get('x-forwarded-host'),
     forwardedProto: headers.get('x-forwarded-proto'),
     fetchSite: headers.get('sec-fetch-site'),
-    marker: headers.get('x-proton-nas-sync'),
+    marker: headers.get('x-proton-drive-sync'),
   };
 }
 
@@ -801,7 +810,7 @@ app.get('/', async (c) => {
     );
 
   const html = await composePage(layout, homeContent, {
-    title: 'Proton NAS Sync',
+    title: 'Proton Drive Sync',
     activeTab: 'home',
     pageScripts: homeScriptsHtml,
   });
@@ -1018,6 +1027,7 @@ app.post('/api/signal/:signal', (c) => {
 
   if (signal === 'retry-all-now') {
     retryAllNow();
+    sendSignal('queue-changed');
     // Force a full refresh of UI state (retry-all-now moves jobs between queues)
     const s = snapshot();
     return c.html(renderRetryQueue(s.retry, s.counts.retry));
@@ -1581,11 +1591,19 @@ app.get('/api/logs', async (c) => {
     // Send logs from startup (limited to last MAX_INITIAL_LOG_LINES)
     await sendNewLines();
 
-    const onFileChange = () => {
-      sendNewLines();
+    // Watch the containing directory so log creation and rotation are also
+    // detected. Unlike fs.watchFile, this does not stat the log twice a second
+    // for every open dashboard.
+    let logReadChain = Promise.resolve();
+    const scheduleLogRead = (): void => {
+      logReadChain = logReadChain.then(sendNewLines).catch(() => undefined);
     };
 
-    watchFile(LOG_FILE, { interval: 500 }, onFileChange);
+    const logWatcher = watch(dirname(LOG_FILE), (_eventType, filename) => {
+      if (!filename || filename.toString() === 'sync.log') {
+        scheduleLogRead();
+      }
+    });
 
     const heartbeat = setInterval(() => {
       stream.writeSSE({ event: 'heartbeat', data: '' });
@@ -1593,7 +1611,7 @@ app.get('/api/logs', async (c) => {
 
     stream.onAbort(() => {
       clearInterval(heartbeat);
-      unwatchFile(LOG_FILE, onFileChange);
+      logWatcher.close();
     });
 
     await new Promise(() => {});

@@ -34,12 +34,12 @@ export const WelcomeModal: FC = () => {
 
         {/* Title */}
         <h2 class="text-2xl text-white text-center mb-3">
-          Welcome to <span class="font-bold">Proton NAS Sync</span>
+          Welcome to <span class="font-bold">Proton Drive Sync</span>
         </h2>
 
         {/* Description */}
         <p class="text-gray-400 text-sm text-center mb-2">
-          Configure safe NAS backups or opt-in two-way beta mappings from one dashboard.
+          Configure safe upload-only or opt-in two-way beta mappings from one dashboard.
         </p>
         <p class="text-gray-400 text-sm text-center mb-6">
           Access it anytime at <span class="text-proton font-mono">localhost:4242</span>

@@ -4,7 +4,7 @@
     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300 mb-2">Service</p>
     <h2 class="text-3xl font-semibold text-white mb-2">Settings</h2>
     <p class="text-sm text-gray-400 mb-6">
-      Control the uploader and map local NAS folders to Proton Drive destinations.
+      Control synchronization and map local folders to Proton Drive destinations.
     </p>
 
     <!-- First row: Pause/Resume and Shut Down -->
@@ -155,7 +155,7 @@
               class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-xs text-gray-300 w-96 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10"
             >
               Number of parallel uploads. Large folder trees are discovered in bounded batches; a
-              value between 1 and 4 is recommended for a NAS.
+              value between 1 and 4 is recommended for most systems.
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ ghcr.io/robje007/proton-drive-sync:latest
 ```
 
 Docker is recommended for NAS installations. For native source builds, see the main
-[README](README.md#native-source-installation).
+[README](README.md#native-installation).
 
 ## Self-contained Compose YAML
 
@@ -31,7 +31,7 @@ services:
 
     environment:
       KEYRING_PASSWORD: 'PASTE_YOUR_GENERATED_KEY_HERE'
-      TZ: 'Europe/Amsterdam'
+      TZ: 'UTC'
       DOCKER: '1'
 
     ports:
@@ -66,8 +66,8 @@ Authenticate in the terminal:
 sudo docker exec -it proton-drive-sync proton-drive-sync auth
 ```
 
-The running service detects credentials without a restart. Open `http://NAS-IP:4242` and add the
-container path `/data/files` as a sync directory.
+The running service detects credentials without a restart. Open `http://localhost:4242` or use the
+server's hostname/IP, then add the container path `/data/files` as a sync directory.
 
 ## Path mapping
 
@@ -75,11 +75,11 @@ Docker sees only explicitly mounted host directories:
 
 ```yaml
 volumes:
-  - /home/robin:/data/robin
-  - /volume/photos:/data/photos
+  - /path/to/documents:/data/documents
+  - /path/to/photos:/data/photos
 ```
 
-Use `/data/robin` and `/data/photos` in the dashboard. The host paths on the left do not exist
+Use `/data/documents` and `/data/photos` in the dashboard. The host paths on the left do not exist
 inside the container.
 
 ## Secure web authentication
@@ -95,7 +95,7 @@ Add it directly to the service environment:
 ```yaml
 environment:
   KEYRING_PASSWORD: 'YOUR_EXISTING_KEY'
-  TZ: 'Europe/Amsterdam'
+  TZ: 'UTC'
   DOCKER: '1'
   WEB_AUTH_ENABLED: '1'
   WEB_AUTH_ACCESS_TOKEN: 'PASTE_A_SEPARATE_TOKEN_OF_AT_LEAST_32_CHARACTERS'

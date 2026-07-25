@@ -54,8 +54,8 @@ const REFRESH_BATCH_INTERVAL_MS = 50;
 // How long to wait before considering sync loop dead (90 seconds)
 const SYNC_HEARTBEAT_TIMEOUT_MS = 90_000;
 
-// Heartbeat interval (1.5 seconds) - checks for status changes
-const HEARTBEAT_INTERVAL_MS = 1500;
+// SSE keepalive. Status changes are sent immediately by the sync engine.
+const HEARTBEAT_INTERVAL_MS = 15_000;
 
 /**
  * Send a message to the dashboard subprocess via stdin.
