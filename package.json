@@ -1,6 +1,6 @@
 {
   "name": "proton-drive-sync",
-  "version": "0.4.0-nas.1",
+  "version": "0.4.0-nas.2",
   "description": "Sync local directories with Proton Drive from Docker or the command line",
   "type": "module",
   "bin": {
