@@ -6,6 +6,7 @@
  */
 
 import type { Config } from '../config.js';
+import type { SyncEventType } from '../db/schema.js';
 
 // ============================================================================
 // Shared Types (used by both parent and child)
@@ -32,6 +33,7 @@ export interface DashboardStatus {
 /** A job item for display in the dashboard */
 export interface DashboardJob {
   id: number;
+  eventType: SyncEventType;
   localPath: string;
   remotePath?: string | null;
   lastError?: string | null;

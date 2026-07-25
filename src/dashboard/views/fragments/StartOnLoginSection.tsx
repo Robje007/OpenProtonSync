@@ -20,7 +20,7 @@ export const StartOnLoginSection: FC<Props> = ({ enabled, managedByDocker = fals
               <Icon name="rocket" class="h-4 w-4" />
             </span>
             <div>
-              <h3 class="text-base font-semibold text-white">Start with NAS</h3>
+              <h3 class="text-base font-semibold text-white">Start automatically</h3>
               <p class="mt-1 text-xs leading-5 text-slate-400">
                 Managed by Docker Compose. Keep{' '}
                 <code class="rounded bg-slate-950/60 px-1.5 py-0.5 text-emerald-200">

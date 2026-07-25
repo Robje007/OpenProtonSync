@@ -10,25 +10,28 @@ import {
 } from './paths.js';
 
 const mapping: SyncDir = {
-  source_path: '/data/robin/Projects',
-  remote_root: '/backupnas/',
+  source_path: '/data/documents/Projects',
+  remote_root: '/Backups/',
 };
 
 describe('remote path normalization', () => {
   test('uses one leading slash and removes trailing slashes', () => {
-    expect(normalizeRemoteRoot('//backupnas///projects/')).toBe('/backupnas/projects');
+    expect(normalizeRemoteRoot('//Backups///projects/')).toBe('/Backups/projects');
     expect(normalizeRemoteRoot('/')).toBe('/');
   });
 
   test('never creates a double slash for a root mapping', () => {
     expect(
-      buildRemotePath({ source_path: '/data/robin', remote_root: '/' }, '/data/robin/Projects/app')
+      buildRemotePath(
+        { source_path: '/data/documents', remote_root: '/' },
+        '/data/documents/Projects/app'
+      )
     ).toBe('/Projects/app');
   });
 
   test('maps a project to the configured remote root', () => {
-    expect(buildRemotePath(mapping, '/data/robin/Projects/meteowarning.eu/.git/HEAD')).toBe(
-      '/backupnas/meteowarning.eu/.git/HEAD'
+    expect(buildRemotePath(mapping, '/data/documents/Projects/example/.git/HEAD')).toBe(
+      '/Backups/example/.git/HEAD'
     );
   });
 });
@@ -41,10 +44,10 @@ describe('local path boundaries', () => {
 
   test('detects nested mappings', () => {
     expect(
-      findOverlappingSyncDir('/data/robin/Projects', [
-        { source_path: '/data/robin', remote_root: '/' },
+      findOverlappingSyncDir('/data/documents/Projects', [
+        { source_path: '/data/documents', remote_root: '/' },
       ])?.source_path
-    ).toBe('/data/robin');
+    ).toBe('/data/documents');
   });
 });
 
@@ -60,15 +63,15 @@ test('old remote-root jobs no longer match current config', () => {
 
   expect(
     findSyncDirForJob(
-      '/data/robin/Projects/meteowarning.eu/package.json',
-      '//Projects/meteowarning.eu/package.json',
+      '/data/documents/Projects/example/package.json',
+      '//Projects/old-location/package.json',
       config
     )
   ).toBeNull();
   expect(
     findSyncDirForJob(
-      '/data/robin/Projects/meteowarning.eu/package.json',
-      '/backupnas/meteowarning.eu/package.json',
+      '/data/documents/Projects/example/package.json',
+      '/Backups/example/package.json',
       config
     )
   ).toEqual(mapping);
@@ -76,7 +79,7 @@ test('old remote-root jobs no longer match current config', () => {
 
 test('legacy double-slash jobs are discarded even for a root mapping', () => {
   const config = {
-    sync_dirs: [{ source_path: '/data/robin', remote_root: '/' }],
+    sync_dirs: [{ source_path: '/data/documents', remote_root: '/' }],
     sync_concurrency: 2,
     remote_delete_behavior: 'trash',
     dashboard_host: '127.0.0.1',
@@ -86,8 +89,8 @@ test('legacy double-slash jobs are discarded even for a root mapping', () => {
 
   expect(
     findSyncDirForJob(
-      '/data/robin/Projects/meteowarning.eu/package.json',
-      '//Projects/meteowarning.eu/package.json',
+      '/data/documents/Projects/example/package.json',
+      '//Projects/old-location/package.json',
       config
     )
   ).toBeNull();

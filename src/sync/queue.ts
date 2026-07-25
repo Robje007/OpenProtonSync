@@ -659,6 +659,7 @@ export function getRecentJobs() {
   return db
     .select({
       id: schema.syncJobs.id,
+      eventType: schema.syncJobs.eventType,
       localPath: schema.syncJobs.localPath,
       remotePath: schema.syncJobs.remotePath,
       createdAt: schema.syncJobs.createdAt,
@@ -676,6 +677,7 @@ export function getBlockedJobs() {
   return db
     .select({
       id: schema.syncJobs.id,
+      eventType: schema.syncJobs.eventType,
       localPath: schema.syncJobs.localPath,
       remotePath: schema.syncJobs.remotePath,
       lastError: schema.syncJobs.lastError,
@@ -694,6 +696,7 @@ export function getProcessingJobs() {
   return db
     .select({
       id: schema.syncJobs.id,
+      eventType: schema.syncJobs.eventType,
       localPath: schema.syncJobs.localPath,
       remotePath: schema.syncJobs.remotePath,
       createdAt: schema.syncJobs.createdAt,
@@ -712,6 +715,7 @@ export function getPendingJobs() {
   return db
     .select({
       id: schema.syncJobs.id,
+      eventType: schema.syncJobs.eventType,
       localPath: schema.syncJobs.localPath,
       remotePath: schema.syncJobs.remotePath,
       createdAt: schema.syncJobs.createdAt,
@@ -732,6 +736,7 @@ export function getRetryJobs() {
   return db
     .select({
       id: schema.syncJobs.id,
+      eventType: schema.syncJobs.eventType,
       localPath: schema.syncJobs.localPath,
       remotePath: schema.syncJobs.remotePath,
       retryAt: schema.syncJobs.retryAt,

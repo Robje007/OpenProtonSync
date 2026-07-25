@@ -1,6 +1,6 @@
 import type { FC } from 'hono/jsx';
 import type { DashboardJob } from './types.js';
-import { formatPath, formatTime } from './utils.js';
+import { formatJobAction, formatPath, formatTime } from './utils.js';
 import { Icon } from './Icon.js';
 
 type Props = {
@@ -42,9 +42,14 @@ export const RecentQueue: FC<Props> = ({ jobs, count, limit }) => {
               >
                 <Icon name="check" class="w-4 h-4 text-green-500 shrink-0" />
                 <div class="min-w-0 flex-1 flex items-center justify-between gap-4">
-                  <span class="text-xs font-mono text-gray-300 truncate">
-                    {formatPath(job.localPath)}
-                  </span>
+                  <div class="min-w-0">
+                    <span class="block text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
+                      {formatJobAction(job.eventType, 'complete')}
+                    </span>
+                    <span class="block truncate text-xs font-mono text-gray-300">
+                      {formatPath(job.localPath)}
+                    </span>
+                  </div>
                   <span class="text-[10px] text-gray-500 font-mono whitespace-nowrap">
                     {formatTime(job.createdAt)}
                   </span>

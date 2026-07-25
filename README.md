@@ -1,9 +1,7 @@
-# Proton NAS Sync
+# Proton Drive Sync
 
-An unofficial Proton Drive sync client for NAS, Docker, and native command-line use. It includes a
-custom dashboard, safe upload backups, and an opt-in **two-way sync beta**.
-
-[Support development on Ko-fi](https://ko-fi.com/robje007)
+An unofficial Proton Drive sync client for local computers, home servers, NAS systems, and Docker.
+It includes a web dashboard, safe upload-only mappings, and an opt-in **two-way sync beta**.
 
 > This community project is not affiliated with or endorsed by Proton AG. Two-way sync is beta and
 > should first be tested with a small, backed-up folder.
@@ -31,7 +29,7 @@ openssl rand -base64 32
 Paste that key directly into this Compose configuration—no separate `.env` file is required:
 
 ```yaml
-name: proton-nas-sync
+name: proton-drive-sync
 
 services:
   proton-drive-sync:
@@ -42,7 +40,7 @@ services:
 
     environment:
       KEYRING_PASSWORD: 'PASTE_YOUR_GENERATED_KEY_HERE'
-      TZ: 'Europe/Amsterdam'
+      TZ: 'UTC'
       DOCKER: '1'
 
     ports:
@@ -51,7 +49,7 @@ services:
     volumes:
       - proton-drive-config:/config/proton-drive-sync
       - proton-drive-state:/state/proton-drive-sync
-      - /home/robin:/data/robin
+      - /path/on/your/host:/data/files
 
     stop_grace_period: 30s
 
@@ -72,20 +70,20 @@ sudo docker logs --tail 100 -f proton-drive-sync
 ```
 
 The service notices saved authentication automatically; a restart after `auth` is not required.
-Open `http://NAS-IP:4242` and add a mapping such as:
+Open `http://localhost:4242` (or use the server's hostname/IP) and add a mapping such as:
 
 ```text
-/data/robin/Projects → /backupnas
+/data/files → /Backups
 ```
 
-Use the path **inside the container**. With `/home/robin:/data/robin`, the dashboard must use
-`/data/robin`, not `/home/robin`.
+Use the path **inside the container**. With `/path/on/your/host:/data/files`, the dashboard must use
+`/data/files`, not the host path.
 
 ## Upload-only or two-way beta
 
 Every mapping has its own direction:
 
-- **NAS → Drive** is the default. Local additions, changes, moves, and deletes are sent to Drive.
+- **Local → Drive** is the default. Local additions, changes, moves, and deletes are sent to Drive.
 - **Two-way (beta)** also downloads changes made in Proton Drive.
 
 Enable two-way in **Settings → Backup configuration → Direction**. Existing configurations without
@@ -95,7 +93,7 @@ For a new native or Docker CLI mapping, add `--two-way`:
 
 ```bash
 sudo docker exec proton-drive-sync proton-drive-sync config sync-dir \
-  --add /data/robin/Projects --remote /backupnas --two-way
+  --add /data/files --remote /Backups --two-way
 ```
 
 The first two-way scan is deliberately conservative:
@@ -178,7 +176,7 @@ reverse proxy or VPN. Only then add `WEB_AUTH_TRUST_PROXY: '1'` and bind the dir
 
 ## Native installation
 
-Docker is recommended on a NAS, but the application is not Docker-only. A native build requires
+Docker works well on a server or NAS, but the application is not Docker-only. A native build requires
 [Bun](https://bun.sh/), Git, a C/C++ build toolchain, Python, and the platform dependencies needed
 by `keytar`.
 
@@ -218,7 +216,7 @@ generated directories should be excluded instead of synchronized.
 
 ### “Local path does not exist”
 
-Use the container-side mount path, for example `/data/robin/Projects`.
+Use the container-side mount path, for example `/data/files`.
 
 ### “Another instance is already running”
 
@@ -245,5 +243,3 @@ bun run build
 ```
 
 Contributions and beta reports are welcome on GitHub. This project is GPL-3.0 licensed.
-
-[Ko-fi: ko-fi.com/robje007](https://ko-fi.com/robje007)

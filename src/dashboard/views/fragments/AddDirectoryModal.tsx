@@ -11,7 +11,7 @@ export const AddDirectoryModal: FC = () => {
       <div class="relative bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-lg shadow-xl">
         <h3 class="text-lg font-semibold text-white mb-1">Add backup mapping</h3>
         <p class="text-sm text-gray-400 mb-5">
-          Choose a path inside the container and its Proton Drive destination.
+          Choose a local path (or a path inside the container) and its Proton Drive destination.
         </p>
 
         <form
@@ -61,7 +61,7 @@ export const AddDirectoryModal: FC = () => {
               name="sync_mode"
               class="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-proton"
             >
-              <option value="upload">NAS → Drive (recommended)</option>
+              <option value="upload">Local → Drive (recommended)</option>
               <option value="two_way">Two-way sync (beta)</option>
             </select>
             <p class="mt-2 text-xs text-amber-300/90">

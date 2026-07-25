@@ -8,7 +8,7 @@ import { existsSync } from 'fs';
 import { db } from '../db/index.js';
 import { SyncEventType } from '../db/schema.js';
 import { logger } from '../logger.js';
-import { registerSignalHandler } from '../signals.js';
+import { registerSignalHandler, unregisterSignalHandler } from '../signals.js';
 import { isPaused, setFlag, FLAGS } from '../flags.js';
 import { sendStatusToDashboard } from '../dashboard/server.js';
 import { getConfig, onConfigChange } from '../config.js';
@@ -26,7 +26,13 @@ import {
   compareWithStoredChangeTokens,
   type FileChange,
 } from './watcher.js';
-import { enqueueJob, cleanupOrphanedJobs, getPendingJobCount } from './queue.js';
+import {
+  enqueueJob,
+  cleanupOrphanedJobs,
+  getPendingJobCount,
+  jobEvents,
+  type JobEvent,
+} from './queue.js';
 import {
   processAvailableJobs,
   waitForActiveTasks,
@@ -53,7 +59,8 @@ import { buildRemotePath, normalizeLocalRoot } from './paths.js';
 import { startTwoWaySync, type TwoWayHandle } from './twoWay.js';
 import { isRemoteApplication } from './remoteEcho.js';
 import {
-  JOB_POLL_INTERVAL_MS,
+  JOB_IDLE_POLL_INTERVAL_MS,
+  JOB_STATUS_HEARTBEAT_INTERVAL_MS,
   SHUTDOWN_TIMEOUT_MS,
   BACKGROUND_RECONCILIATION_INTERVAL_MS,
   BACKGROUND_RECONCILIATION_THROTTLE_MS,
@@ -551,44 +558,72 @@ interface ProcessorHandle {
 }
 
 /**
- * Start the job processor loop that polls for pending jobs.
+ * Start the job processor loop.
+ *
+ * Queue events wake the processor immediately. A slow safety poll remains for
+ * jobs written by another process and retry deadlines, without querying SQLite
+ * every few seconds while the service is idle.
  */
 function startJobProcessorLoop(client: ProtonDriveClient, dryRun: boolean): ProcessorHandle {
   let running = true;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  let loopCount = 0;
-  const processLoop = (): void => {
-    loopCount++;
+  let statusHeartbeatId: ReturnType<typeof setInterval> | null = null;
+  let scheduledAt = 0;
 
-    // Debug log occasionally to ensure the loop is alive
-    if (loopCount % 25 === 0) {
-      logger.debug('processLoop iteration');
-    }
+  const scheduleProcess = (delayMs: number): void => {
+    if (!running) return;
+    const targetTime = Date.now() + delayMs;
+    if (timeoutId && scheduledAt <= targetTime) return;
+    if (timeoutId) clearTimeout(timeoutId);
+    scheduledAt = targetTime;
+    timeoutId = setTimeout(processLoop, delayMs);
+  };
+
+  const processLoop = (): void => {
+    timeoutId = null;
+    scheduledAt = 0;
     if (!running) return;
 
     const paused = isPaused();
-
-    // Always send heartbeat (merged with job processing)
     sendStatusToDashboard({ paused });
 
     if (!paused) {
       processAvailableJobs(client, dryRun);
     }
 
-    if (running) {
-      timeoutId = setTimeout(processLoop, JOB_POLL_INTERVAL_MS);
-    }
+    scheduleProcess(JOB_IDLE_POLL_INTERVAL_MS);
   };
 
-  // Start the loop
+  const handleJobEvent = (event: JobEvent): void => {
+    if (event.type === 'retry' && event.retryAt) {
+      scheduleProcess(Math.max(0, event.retryAt.getTime() - Date.now()));
+      return;
+    }
+    scheduleProcess(0);
+  };
+
+  jobEvents.on('job', handleJobEvent);
+  const handleQueueChanged = (): void => scheduleProcess(0);
+  registerSignalHandler('queue-changed', handleQueueChanged);
+  registerSignalHandler('refresh-dashboard', handleQueueChanged);
+  statusHeartbeatId = setInterval(() => {
+    sendStatusToDashboard({ paused: isPaused() });
+  }, JOB_STATUS_HEARTBEAT_INTERVAL_MS);
   processLoop();
 
   return {
     stop: async () => {
       running = false;
+      jobEvents.off('job', handleJobEvent);
+      unregisterSignalHandler('queue-changed', handleQueueChanged);
+      unregisterSignalHandler('refresh-dashboard', handleQueueChanged);
       if (timeoutId) {
         clearTimeout(timeoutId);
         timeoutId = null;
+      }
+      if (statusHeartbeatId) {
+        clearInterval(statusHeartbeatId);
+        statusHeartbeatId = null;
       }
       // Wait for active tasks to complete (with timeout)
       const timeoutPromise = new Promise<'timeout'>((resolve) =>

@@ -21,7 +21,7 @@ export const Stats: FC<{ counts: JobCounts }> = ({ counts }) => {
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
           <Icon name="refresh-cw" class="w-12 h-12 text-blue-500" />
         </div>
-        <dt class="text-xs font-medium uppercase tracking-wider text-slate-500">Uploading</dt>
+        <dt class="text-xs font-medium uppercase tracking-wider text-slate-500">Remote activity</dt>
         <dd class="mt-2 text-3xl font-semibold text-white transition-colors group-hover:text-blue-300">
           {counts.processing}
         </dd>

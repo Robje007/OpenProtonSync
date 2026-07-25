@@ -3,21 +3,23 @@
     class="rounded-2xl border border-indigo-400/20 bg-gradient-to-br from-indigo-500/15 to-slate-900 p-8"
   >
     <div class="mb-6 flex items-center gap-4">
-      <img src="/assets/icon.svg" alt="Proton NAS Sync" class="h-16 w-16 rounded-2xl" />
+      <img src="/assets/icon.svg" alt="Proton Drive Sync" class="h-16 w-16 rounded-2xl" />
       <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Community fork</p>
-        <h1 class="mt-1 text-3xl font-semibold text-white">Proton NAS Sync</h1>
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">
+          Community project
+        </p>
+        <h1 class="mt-1 text-3xl font-semibold text-white">Proton Drive Sync</h1>
       </div>
     </div>
     <p class="max-w-2xl text-sm leading-6 text-slate-300">
-      A NAS-focused, unofficial Proton Drive uploader with safer restarts, bounded scans, idempotent
-      folder creation and a dashboard designed for headless Docker systems.
+      An unofficial Proton Drive sync client for local computers, servers, NAS systems, and Docker,
+      with restart-safe queues, bounded scans, and a live dashboard.
     </p>
   </section>
 
   <div class="grid gap-6 md:grid-cols-2">
     <section class="rounded-2xl border border-white/8 bg-white/4 p-6">
-      <h2 class="text-lg font-semibold text-white">What this fork changes</h2>
+      <h2 class="text-lg font-semibold text-white">What it provides</h2>
       <ul class="mt-4 space-y-3 text-sm text-slate-400">
         <li>• Restart-safe process locking</li>
         <li>• Batched, exclusion-aware project scans</li>
@@ -40,14 +42,6 @@
           class="inline-flex rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-cyan-300 transition hover:bg-white/5"
         >
           View source on GitHub
-        </a>
-        <a
-          href="https://ko-fi.com/robje007"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex rounded-lg bg-cyan-300 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-100"
-        >
-          Support Robje007 on Ko-fi
         </a>
       </div>
     </section>
