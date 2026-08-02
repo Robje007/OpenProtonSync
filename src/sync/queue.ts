@@ -5,7 +5,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { eq, and, lte, lt, inArray, isNull, sql, asc, desc } from 'drizzle-orm';
+import { eq, and, lte, lt, gte, inArray, isNull, sql, asc, desc } from 'drizzle-orm';
 import { db, schema, run, type Tx } from '../db/index.js';
 import { SyncJobStatus, SyncEventType } from '../db/schema.js';
 import { logger, isDebugEnabled } from '../logger.js';
@@ -69,6 +69,8 @@ export interface Job {
   lastError: string | null;
   /** Timestamp when this job was created */
   createdAt: Date;
+  /** Timestamp when this job reached SYNCED or BLOCKED */
+  finishedAt: Date | null;
   /** Change token (mtime:size) for change detection (null for directories) */
   changeToken: string | null;
   /** Original local path before rename/move (null for CREATE/UPDATE/DELETE) */
@@ -90,9 +92,57 @@ export const dryRunProcessingIds = new Set<number>();
 /** Set of job IDs already synced during dry-run mode */
 export const dryRunSyncedIds = new Set<number>();
 
+const SYNCED_RETENTION_MS = 24 * 60 * 60 * 1000;
+const BLOCKED_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+const FINISHED_JOB_CLEANUP_INTERVAL_MS = 60 * 60 * 1000;
+
+let nextFinishedJobCleanupAt = 0;
+
 // ============================================================================
 // Job Queue Functions
 // ============================================================================
+
+function cleanupFinishedJobsInTransaction(tx: Tx, now: Date): void {
+  const syncedCutoff = new Date(now.getTime() - SYNCED_RETENTION_MS);
+  const blockedCutoff = new Date(now.getTime() - BLOCKED_RETENTION_MS);
+
+  const syncedResult = run(
+    tx
+      .delete(schema.syncJobs)
+      .where(
+        and(
+          eq(schema.syncJobs.status, SyncJobStatus.SYNCED),
+          lt(schema.syncJobs.finishedAt, syncedCutoff)
+        )
+      )
+  );
+  const blockedResult = run(
+    tx
+      .delete(schema.syncJobs)
+      .where(
+        and(
+          eq(schema.syncJobs.status, SyncJobStatus.BLOCKED),
+          lt(schema.syncJobs.finishedAt, blockedCutoff)
+        )
+      )
+  );
+
+  if (syncedResult.changes > 0) {
+    logger.debug(`Cleaned up ${syncedResult.changes} synced jobs older than 24 hours`);
+  }
+  if (blockedResult.changes > 0) {
+    logger.debug(`Cleaned up ${blockedResult.changes} blocked jobs older than 7 days`);
+  }
+}
+
+/** Remove completed and permanently failed jobs after their dashboard retention period. */
+export function cleanupFinishedJobs(force: boolean = false): void {
+  const now = new Date();
+  if (!force && now.getTime() < nextFinishedJobCleanupAt) return;
+
+  db.transaction((tx) => cleanupFinishedJobsInTransaction(tx, now));
+  nextFinishedJobCleanupAt = now.getTime() + FINISHED_JOB_CLEANUP_INTERVAL_MS;
+}
 
 /** Parameters for creating a new sync job - subset of Job fields */
 export type EnqueueJobParams = Pick<Job, 'eventType' | 'localPath' | 'remotePath' | 'changeToken'>;
@@ -136,6 +186,7 @@ export function enqueueJob(params: EnqueueJobParams, dryRun: boolean, tx: Tx): v
         retryAt: new Date(),
         nRetries: 0,
         lastError: null,
+        finishedAt: null,
         changeToken: params.changeToken ?? null,
         oldLocalPath: null,
         oldRemotePath: null,
@@ -148,6 +199,7 @@ export function enqueueJob(params: EnqueueJobParams, dryRun: boolean, tx: Tx): v
           retryAt: new Date(),
           nRetries: 0,
           lastError: null,
+          finishedAt: null,
           changeToken: params.changeToken ?? null,
           oldLocalPath: null,
           oldRemotePath: null,
@@ -204,6 +256,8 @@ export function cleanupOrphanedJobs(dryRun: boolean, tx: Tx): void {
   if (resetResult.changes > 0) {
     logger.info(`Reset ${resetResult.changes} stale processing jobs to pending`);
   }
+
+  cleanupFinishedJobsInTransaction(tx, new Date());
 
   // 2. Delete unsynced jobs that no longer match the exact local/remote mapping.
   const config = getConfig();
@@ -271,6 +325,7 @@ export function getNextPendingJob(dryRun: boolean = false): Job | undefined {
         retryAt: schema.syncJobs.retryAt,
         lastError: schema.syncJobs.lastError,
         createdAt: schema.syncJobs.createdAt,
+        finishedAt: schema.syncJobs.finishedAt,
         changeToken: schema.syncJobs.changeToken,
         oldLocalPath: schema.syncJobs.oldLocalPath,
         oldRemotePath: schema.syncJobs.oldRemotePath,
@@ -345,6 +400,7 @@ export function getNextPendingJob(dryRun: boolean = false): Job | undefined {
         retryAt: schema.syncJobs.retryAt,
         lastError: schema.syncJobs.lastError,
         createdAt: schema.syncJobs.createdAt,
+        finishedAt: schema.syncJobs.finishedAt,
         changeToken: schema.syncJobs.changeToken,
         oldLocalPath: schema.syncJobs.oldLocalPath,
         oldRemotePath: schema.syncJobs.oldRemotePath,
@@ -407,7 +463,7 @@ export function markJobSynced(jobId: number, localPath: string, dryRun: boolean,
   logger.debug(`Marking job ${jobId} as SYNCED (${localPath})`);
 
   tx.update(schema.syncJobs)
-    .set({ status: SyncJobStatus.SYNCED, lastError: null })
+    .set({ status: SyncJobStatus.SYNCED, lastError: null, finishedAt: new Date() })
     .where(and(eq(schema.syncJobs.id, jobId), eq(schema.syncJobs.status, SyncJobStatus.PROCESSING)))
     .run();
   tx.delete(schema.processingQueue).where(eq(schema.processingQueue.localPath, localPath)).run();
@@ -419,19 +475,7 @@ export function markJobSynced(jobId: number, localPath: string, dryRun: boolean,
     timestamp: new Date(),
   } satisfies JobEvent);
 
-  // Cleanup SYNCED jobs older than 24 hours
-  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const deleted = run(
-    tx
-      .delete(schema.syncJobs)
-      .where(
-        and(eq(schema.syncJobs.status, SyncJobStatus.SYNCED), lt(schema.syncJobs.createdAt, cutoff))
-      )
-  );
-
-  if (deleted.changes > 0) {
-    logger.debug(`Cleaned up ${deleted.changes} SYNCED jobs older than 24 hours`);
-  }
+  cleanupFinishedJobsInTransaction(tx, new Date());
 }
 
 /**
@@ -449,7 +493,7 @@ export function markJobBlocked(
   logger.debug(`Marking job ${jobId} as BLOCKED (${localPath})`);
 
   tx.update(schema.syncJobs)
-    .set({ status: SyncJobStatus.BLOCKED, lastError: error })
+    .set({ status: SyncJobStatus.BLOCKED, lastError: error, finishedAt: new Date() })
     .where(and(eq(schema.syncJobs.id, jobId), eq(schema.syncJobs.status, SyncJobStatus.PROCESSING)))
     .run();
   tx.delete(schema.processingQueue).where(eq(schema.processingQueue.localPath, localPath)).run();
@@ -461,6 +505,8 @@ export function markJobBlocked(
     error,
     timestamp: new Date(),
   } satisfies JobEvent);
+
+  cleanupFinishedJobsInTransaction(tx, new Date());
 }
 
 /**
@@ -626,15 +672,19 @@ export function getJobCounts(): {
   synced: number;
   blocked: number;
 } {
+  cleanupFinishedJobs();
+
   const nowSeconds = Math.floor(Date.now() / 1000);
+  const syncedCutoffSeconds = Math.floor((Date.now() - SYNCED_RETENTION_MS) / 1000);
+  const blockedCutoffSeconds = Math.floor((Date.now() - BLOCKED_RETENTION_MS) / 1000);
 
   const result = db
     .select({
       pendingReady: sql<number>`SUM(CASE WHEN ${schema.syncJobs.status} = ${SyncJobStatus.PENDING} AND ${schema.syncJobs.retryAt} <= ${nowSeconds} THEN 1 ELSE 0 END)`,
       retry: sql<number>`SUM(CASE WHEN ${schema.syncJobs.status} = ${SyncJobStatus.PENDING} AND ${schema.syncJobs.retryAt} > ${nowSeconds} THEN 1 ELSE 0 END)`,
       processing: sql<number>`SUM(CASE WHEN ${schema.syncJobs.status} = ${SyncJobStatus.PROCESSING} THEN 1 ELSE 0 END)`,
-      synced: sql<number>`SUM(CASE WHEN ${schema.syncJobs.status} = ${SyncJobStatus.SYNCED} THEN 1 ELSE 0 END)`,
-      blocked: sql<number>`SUM(CASE WHEN ${schema.syncJobs.status} = ${SyncJobStatus.BLOCKED} THEN 1 ELSE 0 END)`,
+      synced: sql<number>`SUM(CASE WHEN ${schema.syncJobs.status} = ${SyncJobStatus.SYNCED} AND ${schema.syncJobs.finishedAt} >= ${syncedCutoffSeconds} THEN 1 ELSE 0 END)`,
+      blocked: sql<number>`SUM(CASE WHEN ${schema.syncJobs.status} = ${SyncJobStatus.BLOCKED} AND ${schema.syncJobs.finishedAt} >= ${blockedCutoffSeconds} THEN 1 ELSE 0 END)`,
     })
     .from(schema.syncJobs)
     .get();
@@ -656,6 +706,9 @@ export function getJobCounts(): {
  * Get recently synced jobs.
  */
 export function getRecentJobs() {
+  cleanupFinishedJobs();
+
+  const cutoff = new Date(Date.now() - SYNCED_RETENTION_MS);
   return db
     .select({
       id: schema.syncJobs.id,
@@ -665,7 +718,9 @@ export function getRecentJobs() {
       createdAt: schema.syncJobs.createdAt,
     })
     .from(schema.syncJobs)
-    .where(eq(schema.syncJobs.status, SyncJobStatus.SYNCED))
+    .where(
+      and(eq(schema.syncJobs.status, SyncJobStatus.SYNCED), gte(schema.syncJobs.finishedAt, cutoff))
+    )
     .orderBy(desc(schema.syncJobs.id))
     .all();
 }
@@ -674,6 +729,9 @@ export function getRecentJobs() {
  * Get blocked jobs with error details.
  */
 export function getBlockedJobs() {
+  cleanupFinishedJobs();
+
+  const cutoff = new Date(Date.now() - BLOCKED_RETENTION_MS);
   return db
     .select({
       id: schema.syncJobs.id,
@@ -685,7 +743,12 @@ export function getBlockedJobs() {
       createdAt: schema.syncJobs.createdAt,
     })
     .from(schema.syncJobs)
-    .where(eq(schema.syncJobs.status, SyncJobStatus.BLOCKED))
+    .where(
+      and(
+        eq(schema.syncJobs.status, SyncJobStatus.BLOCKED),
+        gte(schema.syncJobs.finishedAt, cutoff)
+      )
+    )
     .all();
 }
 
