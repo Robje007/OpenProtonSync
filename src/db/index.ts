@@ -25,6 +25,7 @@ import migration0007 from './migrations/0007_overlapping_sync_dirs.sql' with { t
 import migration0008 from './migrations/0008_file_state_sha1.sql' with { type: 'text' };
 import migration0009 from './migrations/0009_two_way_sync_state.sql' with { type: 'text' };
 import migration0010 from './migrations/0010_job_retention.sql' with { type: 'text' };
+import migration0011 from './migrations/0011_remove_recycle_jobs.sql' with { type: 'text' };
 
 const migrations = [
   { id: '0000_hot_whizzer', sql: migration0000 },
@@ -38,6 +39,7 @@ const migrations = [
   { id: '0008_file_state_sha1', sql: migration0008 },
   { id: '0009_two_way_sync_state', sql: migration0009 },
   { id: '0010_job_retention', sql: migration0010 },
+  { id: '0011_remove_recycle_jobs', sql: migration0011 },
 ];
 
 // ============================================================================

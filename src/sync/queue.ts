@@ -5,7 +5,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { eq, and, lte, lt, gte, inArray, isNull, sql, asc, desc } from 'drizzle-orm';
+import { existsSync } from 'fs';
+import { eq, and, lte, lt, gt, gte, ne, inArray, isNull, sql, asc, desc } from 'drizzle-orm';
 import { db, schema, run, type Tx } from '../db/index.js';
 import { SyncJobStatus, SyncEventType } from '../db/schema.js';
 import { logger, isDebugEnabled } from '../logger.js';
@@ -95,6 +96,8 @@ export const dryRunSyncedIds = new Set<number>();
 const SYNCED_RETENTION_MS = 24 * 60 * 60 * 1000;
 const BLOCKED_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 const FINISHED_JOB_CLEANUP_INTERVAL_MS = 60 * 60 * 1000;
+const ORPHAN_SCAN_BATCH_SIZE = 5_000;
+const ORPHAN_DELETE_BATCH_SIZE = 500;
 
 let nextFinishedJobCleanupAt = 0;
 
@@ -259,31 +262,56 @@ export function cleanupOrphanedJobs(dryRun: boolean, tx: Tx): void {
 
   cleanupFinishedJobsInTransaction(tx, new Date());
 
-  // 2. Delete unsynced jobs that no longer match the exact local/remote mapping.
+  // 2. Delete unsynced jobs that no longer match the exact local/remote mapping,
+  // are newly excluded, or need a local source that no longer exists. Scan by
+  // primary-key batches so a polluted queue cannot exhaust memory or SQLite's
+  // bound-parameter limit.
   const config = getConfig();
-  const queuedJobs = tx
-    .select({
-      id: schema.syncJobs.id,
-      localPath: schema.syncJobs.localPath,
-      remotePath: schema.syncJobs.remotePath,
-      status: schema.syncJobs.status,
-    })
-    .from(schema.syncJobs)
-    .all();
+  let lastScannedId = 0;
+  let removedCount = 0;
 
-  const orphanIds = queuedJobs
-    .filter((job) => job.status !== SyncJobStatus.SYNCED)
-    .filter((job) => {
-      const syncDir = findSyncDirForJob(job.localPath, job.remotePath, config);
-      return (
-        !syncDir || isPathExcluded(job.localPath, syncDir.source_path, config.exclude_patterns)
-      );
-    })
-    .map((job) => job.id);
+  while (true) {
+    const queuedJobs = tx
+      .select({
+        id: schema.syncJobs.id,
+        eventType: schema.syncJobs.eventType,
+        localPath: schema.syncJobs.localPath,
+        remotePath: schema.syncJobs.remotePath,
+      })
+      .from(schema.syncJobs)
+      .where(
+        and(gt(schema.syncJobs.id, lastScannedId), ne(schema.syncJobs.status, SyncJobStatus.SYNCED))
+      )
+      .orderBy(asc(schema.syncJobs.id))
+      .limit(ORPHAN_SCAN_BATCH_SIZE)
+      .all();
 
-  if (orphanIds.length > 0) {
-    run(tx.delete(schema.syncJobs).where(inArray(schema.syncJobs.id, orphanIds)));
-    logger.info(`Removed ${orphanIds.length} stale or excluded queued jobs`);
+    if (queuedJobs.length === 0) break;
+    lastScannedId = queuedJobs[queuedJobs.length - 1].id;
+
+    const orphanIds = queuedJobs
+      .filter((job) => {
+        const syncDir = findSyncDirForJob(job.localPath, job.remotePath, config);
+        if (!syncDir) return true;
+        if (isPathExcluded(job.localPath, syncDir.source_path, config.exclude_patterns)) {
+          return true;
+        }
+
+        const needsLocalSource = job.eventType !== SyncEventType.DELETE;
+        return needsLocalSource && existsSync(syncDir.source_path) && !existsSync(job.localPath);
+      })
+      .map((job) => job.id);
+
+    for (let offset = 0; offset < orphanIds.length; offset += ORPHAN_DELETE_BATCH_SIZE) {
+      const ids = orphanIds.slice(offset, offset + ORPHAN_DELETE_BATCH_SIZE);
+      removedCount += run(
+        tx.delete(schema.syncJobs).where(inArray(schema.syncJobs.id, ids))
+      ).changes;
+    }
+  }
+
+  if (removedCount > 0) {
+    logger.info(`Removed ${removedCount} stale, missing, or excluded queued jobs`);
   }
 }
 

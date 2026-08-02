@@ -9,6 +9,16 @@ import { relative } from 'path';
 
 import type { ExcludePattern } from '../config.js';
 
+/** Platform recycle folders must never be uploaded, even with an empty user exclusion list. */
+export const ALWAYS_EXCLUDED_DIRECTORY_NAMES = [
+  '#recycle',
+  '$recycle.bin',
+  '.trash',
+  '.trashes',
+] as const;
+
+const ALWAYS_EXCLUDED_DIRECTORIES: ReadonlySet<string> = new Set(ALWAYS_EXCLUDED_DIRECTORY_NAMES);
+
 // ============================================================================
 // Glob to Regex Conversion
 // ============================================================================
@@ -123,10 +133,17 @@ export function isPathExcluded(
     return false;
   }
 
-  // Internal two-way safety data must never be uploaded back to Drive.
+  const normalizedRelativePath = relativePath.split('\\').join('/');
   if (
-    /(^|\/)\.proton-sync-(conflicts|recovery|tmp)(\/|$)/.test(relativePath.split('\\').join('/'))
+    normalizedRelativePath
+      .split('/')
+      .some((segment) => ALWAYS_EXCLUDED_DIRECTORIES.has(segment.toLowerCase()))
   ) {
+    return true;
+  }
+
+  // Internal two-way safety data must never be uploaded back to Drive.
+  if (/(^|\/)\.proton-sync-(conflicts|recovery|tmp)(\/|$)/.test(normalizedRelativePath)) {
     return true;
   }
 

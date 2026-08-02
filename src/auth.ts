@@ -1324,6 +1324,17 @@ export function createProtonHttpClient(
     headers.set('x-pm-appversion', APP_VERSION);
   };
 
+  const refreshSession = async (): Promise<void> => {
+    if (!onTokenRefresh) return;
+
+    try {
+      await onTokenRefresh();
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      throw new Error(`Token refresh failed: ${reason}`, { cause: error });
+    }
+  };
+
   return {
     async fetchJson(request: HttpClientRequest): Promise<Response> {
       const { url, method, headers, json, timeoutMs, signal } = request;
@@ -1345,19 +1356,15 @@ export function createProtonHttpClient(
 
         // Handle expired access token (401) - try to refresh and retry
         if (response.status === 401 && session.RefreshToken && onTokenRefresh) {
-          try {
-            await onTokenRefresh();
-            // Update headers with new token and retry
-            setAuthHeaders(headers);
-            response = await fetch(fullUrl, {
-              method,
-              headers,
-              body: json ? JSON.stringify(json) : undefined,
-              signal: signal || controller.signal,
-            });
-          } catch {
-            // Refresh failed, return original 401 response
-          }
+          await refreshSession();
+          // Update headers with new token and retry
+          setAuthHeaders(headers);
+          response = await fetch(fullUrl, {
+            method,
+            headers,
+            body: json ? JSON.stringify(json) : undefined,
+            signal: signal || controller.signal,
+          });
         }
 
         return response;
@@ -1386,19 +1393,15 @@ export function createProtonHttpClient(
 
         // Handle expired access token (401) - try to refresh and retry
         if (response.status === 401 && session.RefreshToken && onTokenRefresh) {
-          try {
-            await onTokenRefresh();
-            // Update headers with new token and retry
-            setAuthHeaders(headers);
-            response = await fetch(fullUrl, {
-              method,
-              headers,
-              body,
-              signal: signal || controller.signal,
-            });
-          } catch {
-            // Refresh failed, return original 401 response
-          }
+          await refreshSession();
+          // Update headers with new token and retry
+          setAuthHeaders(headers);
+          response = await fetch(fullUrl, {
+            method,
+            headers,
+            body,
+            signal: signal || controller.signal,
+          });
         }
 
         return response;

@@ -54,20 +54,24 @@ interface StartOptions {
 // Retry delays in seconds (array length determines max retries)
 const NETWORK_DELAYS = [1, 4, 16, 64, 256];
 const RATE_LIMIT_DELAYS = [32, 128, 512, 512, 512];
+const DOCKER_AUTH_RETRY_DELAY_MS = 60_000;
 
 /**
  * Authenticate using stored tokens with retry and exponential backoff.
  * Sends status updates to the dashboard via IPC.
  * @param sdkDebug - Enable debug logging for the Proton SDK
  */
-async function authenticateWithStatus(sdkDebug = false): Promise<ProtonDriveClient> {
+async function authenticateWithStatus(
+  sdkDebug = false,
+  announceAttempt = true
+): Promise<ProtonDriveClient> {
   const storedCreds = await getStoredCredentials();
   if (!storedCreds) {
     sendStatusToDashboard({ auth: { status: 'failed' } });
     throw new Error('No credentials found. Run `proton-drive-sync auth` first.');
   }
 
-  logger.info('Authenticating with stored tokens...');
+  if (announceAttempt) logger.info('Authenticating with stored tokens...');
 
   const getRetryDelays = (error: Error): number[] | null => {
     if (error.message.includes('Too many recent API requests')) return RATE_LIMIT_DELAYS;
@@ -112,7 +116,7 @@ async function authenticateForRuntime(sdkDebug = false): Promise<ProtonDriveClie
 
   while (true) {
     try {
-      return await authenticateWithStatus(sdkDebug);
+      return await authenticateWithStatus(sdkDebug, !waitingLogged);
     } catch (error) {
       if (!isDocker()) throw error;
 
@@ -122,11 +126,12 @@ async function authenticateForRuntime(sdkDebug = false): Promise<ProtonDriveClie
         logger.info(
           'Container is staying online. Run `proton-drive-sync auth`; syncing will start without a restart.'
         );
+        logger.info('Authentication will be checked again once per minute.');
         waitingLogged = true;
       } else {
         logger.debug(`Still waiting for authentication: ${message}`);
       }
-      await new Promise((resolve) => setTimeout(resolve, 5_000));
+      await new Promise((resolve) => setTimeout(resolve, DOCKER_AUTH_RETRY_DELAY_MS));
     }
   }
 }
