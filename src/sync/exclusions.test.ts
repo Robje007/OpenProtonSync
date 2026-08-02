@@ -37,4 +37,12 @@ describe('exclusions', () => {
       isPathExcluded('/data/Projects/.proton-sync-recovery/file.txt', '/data/Projects', [])
     ).toBe(true);
   });
+
+  test('always excludes platform recycle folders even with an empty config', () => {
+    expect(isPathExcluded('/data/robin/#recycle/file.txt', '/data/robin', [])).toBe(true);
+    expect(isPathExcluded('/data/robin/archive/$RECYCLE.BIN/file.txt', '/data/robin', [])).toBe(
+      true
+    );
+    expect(isPathExcluded('/data/robin/.Trashes/file.txt', '/data/robin', [])).toBe(true);
+  });
 });

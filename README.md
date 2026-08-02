@@ -1,10 +1,14 @@
 # Proton Drive Sync
 
+[![Support on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/robje007)
+
 An unofficial Proton Drive sync client for local computers, home servers, NAS systems, and Docker.
 It includes a web dashboard, safe upload-only mappings, and an opt-in **two-way sync beta**.
 
 > This community project is not affiliated with or endorsed by Proton AG. Two-way sync is beta and
 > should first be tested with a small, backed-up folder.
+
+If Proton Drive Sync is useful to you, you can [support its development on Ko-fi](https://ko-fi.com/robje007).
 
 ## Features
 
@@ -212,6 +216,9 @@ venv
 Your source, dotfiles, and `.git` directory remain included unless you exclude them yourself. Large
 generated directories should be excluded instead of synchronized.
 
+Platform recycle folders such as `#recycle`, `$RECYCLE.BIN`, `.Trash`, and `.Trashes` are always
+excluded, including when an older configuration contains an explicitly empty exclusion list.
+
 ## Troubleshooting
 
 ### “Local path does not exist”
@@ -222,6 +229,11 @@ Use the container-side mount path, for example `/data/files`.
 
 Do not start a second sync process with `docker exec`. The container already runs it. If no process
 is actually active, use the `unlock` command shown above.
+
+### “Refresh token expired”
+
+Run `proton-drive-sync auth` again. In Docker, the container stays online and checks for updated
+credentials once per minute without flooding its logs.
 
 ### Dashboard is not reachable
 
