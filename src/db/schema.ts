@@ -82,9 +82,11 @@ export const syncJobs = sqliteTable(
     createdAt: integer('created_at', { mode: 'timestamp' })
       .notNull()
       .$defaultFn(() => new Date()),
+    finishedAt: integer('finished_at', { mode: 'timestamp' }),
   },
   (table) => [
     index('idx_sync_jobs_status_retry').on(table.status, table.retryAt),
+    index('idx_sync_jobs_status_finished').on(table.status, table.finishedAt),
     uniqueIndex('idx_sync_jobs_local_remote').on(table.localPath, table.remotePath),
   ]
 );

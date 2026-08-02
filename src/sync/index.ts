@@ -27,6 +27,7 @@ export {
   getNextPendingJob,
   markJobSynced,
   markJobBlocked,
+  cleanupFinishedJobs,
   setJobError,
   categorizeError,
   scheduleRetry,
