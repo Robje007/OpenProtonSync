@@ -17,10 +17,10 @@
       # These are updated automatically by CI on each stable release.
       version = "1.0.0";
       hashes = {
-        x86_64-linux = "sha256-vV01c0WZeIjKyG1ER0bp56Pl5l1puPFZl1SMNli32T0=";
-        aarch64-linux = "sha256-NKi4GutP6w/kr4LpTfM3GR3afSGjERM7jGJvAN2Z0AY=";
-        aarch64-darwin = "sha256-4ZfZcSCbsZTfnFFryZZGRS1qfZnqd+s3JGeQ7I9ROwk=";
-        x86_64-darwin = "sha256-pnF7avIDzyaya0QSAXYAQw8reQVlV4E81n4pwwJJN2A=";
+        x86_64-linux = "sha256-b5ZHoiHmkY+TtfNimEuysJcWkUjM6sUbCiR0O+uR5M4=";
+        aarch64-linux = "sha256-1hnyt4F31r+b9r121dw5C8v5S3VZNcdlS3QuxOHQcOU=";
+        aarch64-darwin = "sha256-mUXKZJNSTWYbKTVBXdZlXqmxiHKkNsNSBFsrJTF4Vcg=";
+        x86_64-darwin = "sha256-TtPJH7++j9miczsK2BohzqvmBFoM7s7ThFdvXYjY300=";
       };
 
       # Map Nix system strings to GitHub release artifact suffixes.
