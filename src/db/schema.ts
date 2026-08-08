@@ -1,5 +1,5 @@
 /**
- * Proton Drive Sync - Database Schema
+ * OpenProtonSync - Database Schema
  *
  * Drizzle ORM schema for SQLite state storage.
  */

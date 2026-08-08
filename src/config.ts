@@ -1,7 +1,7 @@
 /**
- * Proton Drive Sync - Configuration
+ * OpenProtonSync - Configuration
  *
- * Reads config from ~/.config/proton-drive-sync/config.json
+ * Reads config from ~/.config/openprotonsync/config.json
  * Supports hot-reloading via namespaced signals (config:reload:<key>)
  */
 

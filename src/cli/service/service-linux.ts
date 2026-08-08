@@ -22,19 +22,19 @@ import {
 } from '../../paths.js';
 import type { ServiceOperations, InstallScope } from './types.js';
 // @ts-expect-error Bun text imports
-import serviceTemplate from './templates/proton-drive-sync.service' with { type: 'text' };
+import serviceTemplate from './templates/openprotonsync.service' with { type: 'text' };
 
 // ============================================================================
 // Constants
 // ============================================================================
 
-const SERVICE_NAME = 'proton-drive-sync';
+const SERVICE_NAME = 'openprotonsync';
 
 // Default encryption password for file-based credential storage
 // This is stored in the systemd service file anyway, so hardcoding doesn't reduce security
-const ENCRYPTION_PASSWORD = 'proton-drive-sync';
+const ENCRYPTION_PASSWORD = 'openprotonsync';
 
-const FLATPAK_APP_ID = 'io.github.damianbbitflipper.ProtonDriveSync';
+const FLATPAK_APP_ID = 'io.github.robje007.OpenProtonSync';
 
 // ============================================================================
 // Path Helpers
@@ -52,15 +52,15 @@ function getPaths(scope: InstallScope): ServicePaths {
   if (scope === 'system') {
     return {
       serviceDir: '/etc/systemd/system',
-      servicePath: '/etc/systemd/system/proton-drive-sync.service',
-      dataDir: '/etc/proton-drive-sync',
+      servicePath: '/etc/systemd/system/openprotonsync.service',
+      dataDir: '/etc/openprotonsync',
     };
   }
 
   return {
     serviceDir: join(home, '.config', 'systemd', 'user'),
-    servicePath: join(home, '.config', 'systemd', 'user', 'proton-drive-sync.service'),
-    dataDir: join(home, '.config', 'proton-drive-sync'),
+    servicePath: join(home, '.config', 'systemd', 'user', 'openprotonsync.service'),
+    dataDir: join(home, '.config', 'openprotonsync'),
   };
 }
 
@@ -183,7 +183,7 @@ function createLinuxService(scope: InstallScope): ServiceOperations {
         chownToEffectiveUser(paths.dataDir);
       }
 
-      logger.info(`Installing proton-drive-sync service (${scope} scope)...`);
+      logger.info(`Installing openprotonsync service (${scope} scope)...`);
 
       if (isFlatpak()) {
         logger.info('Flatpak detected: service will be managed on the host via flatpak-spawn.');
@@ -207,7 +207,7 @@ function createLinuxService(scope: InstallScope): ServiceOperations {
           logger.error('Could not reload systemd daemon (user services require a login session)');
           logger.info('The service will start automatically on your next login.');
           logger.info('To manage services over SSH, use system-level installation instead:');
-          logger.info('  proton-drive-sync service install --install-scope system');
+          logger.info('  openprotonsync service install --install-scope system');
         } else {
           logger.error('Failed to reload systemd daemon');
         }
@@ -217,10 +217,10 @@ function createLinuxService(scope: InstallScope): ServiceOperations {
       setFlag(FLAGS.SERVICE_INSTALLED);
 
       if (this.load()) {
-        logger.info('proton-drive-sync service installed and started.');
+        logger.info('openprotonsync service installed and started.');
         return true;
       } else {
-        logger.error('proton-drive-sync service installed but failed to start.');
+        logger.error('openprotonsync service installed but failed to start.');
         return false;
       }
     },
@@ -282,7 +282,7 @@ function createLinuxService(scope: InstallScope): ServiceOperations {
 
       clearFlag(FLAGS.SERVICE_INSTALLED);
       clearFlag(FLAGS.SERVICE_LOADED);
-      logger.info('proton-drive-sync service uninstalled.');
+      logger.info('openprotonsync service uninstalled.');
       return true;
     },
 

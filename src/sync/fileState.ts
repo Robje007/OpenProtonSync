@@ -1,5 +1,5 @@
 /**
- * Proton Drive Sync - File State Storage
+ * OpenProtonSync - File State Storage
  *
  * Tracks file state (mtime:size and content SHA1) for synced files to detect changes.
  * Used to skip uploads when file content hasn't changed, even if mtime shifts

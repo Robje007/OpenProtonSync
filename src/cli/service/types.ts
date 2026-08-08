@@ -2,7 +2,7 @@
  * Shared types for platform-specific service implementations
  */
 
-export const SERVICE_NAME = 'proton-drive-sync';
+export const SERVICE_NAME = 'openprotonsync';
 
 export type InstallScope = 'user' | 'system';
 

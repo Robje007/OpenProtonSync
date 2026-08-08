@@ -4,15 +4,15 @@ pkgver={{VERSION}}
 pkgrel=1
 pkgdesc='{{PACKAGE_DESC}}'
 arch=('x86_64' 'aarch64')
-url='https://github.com/Robje007/proton-drive-sync'
+url='https://github.com/Robje007/OpenProtonSync'
 license=('GPL-3.0-only')
 depends=('libsecret')
-provides=('proton-drive-sync')
+provides=('openprotonsync')
 conflicts=('proton-drive-sync' 'proton-drive-sync-bin')
 options=('!strip' '!debug')
 
-source_x86_64=("${pkgname}-${pkgver}-x86_64.tar.gz::https://github.com/Robje007/proton-drive-sync/releases/download/v{{VERSION_ORIGINAL}}/proton-drive-sync-linux-x64.tar.gz")
-source_aarch64=("${pkgname}-${pkgver}-aarch64.tar.gz::https://github.com/Robje007/proton-drive-sync/releases/download/v{{VERSION_ORIGINAL}}/proton-drive-sync-linux-arm64.tar.gz")
+source_x86_64=("${pkgname}-${pkgver}-x86_64.tar.gz::https://github.com/Robje007/OpenProtonSync/releases/download/v{{VERSION_ORIGINAL}}/openprotonsync-linux-x64.tar.gz")
+source_aarch64=("${pkgname}-${pkgver}-aarch64.tar.gz::https://github.com/Robje007/OpenProtonSync/releases/download/v{{VERSION_ORIGINAL}}/openprotonsync-linux-arm64.tar.gz")
 sha256sums_x86_64=('{{SHA256_X64}}')
 sha256sums_aarch64=('{{SHA256_ARM64}}')
 
@@ -22,5 +22,5 @@ package() {
     # safeguard in case the user's makepkg.conf enables strip globally.
     export STRIP=/usr/bin/true
 
-    install -Dm755 proton-drive-sync "${pkgdir}/usr/bin/proton-drive-sync"
+    install -Dm755 openprotonsync "${pkgdir}/usr/bin/openprotonsync"
 }

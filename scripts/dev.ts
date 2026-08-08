@@ -21,7 +21,7 @@ const WATCH_DIR = 'src';
 const WATCH_EXTENSIONS = new Set(['.ts', '.tsx', '.html', '.css', '.json', '.txt', '.sql']);
 const DEBOUNCE_MS = 300;
 const BUILD_COMMAND = ['make', 'build'];
-const APP_COMMAND = ['proton-drive-sync'];
+const APP_COMMAND = ['openprotonsync'];
 
 // ============================================================================
 // State
@@ -66,7 +66,7 @@ function startApp(args: string[]): void {
   const cmd = [...APP_COMMAND, ...args];
   console.log(`\x1b[36m[dev]\x1b[0m Starting: ${cmd.join(' ')}`);
 
-  // Add dist/ to PATH so proton-drive-sync resolves to the local build
+  // Add dist/ to PATH so openprotonsync resolves to the local build
   const env = {
     ...process.env,
     PATH: `${process.cwd()}/dist:${process.env.PATH}`,

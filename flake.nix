@@ -40,11 +40,11 @@
           isLinux = pkgs.lib.hasSuffix "linux" system;
         in
         pkgs.stdenv.mkDerivation {
-          pname = "proton-drive-sync";
+          pname = "openprotonsync";
           inherit version;
 
           src = pkgs.fetchurl {
-            url = "https://github.com/Robje007/proton-drive-sync/releases/download/v${version}/proton-drive-sync-${target}.tar.gz";
+            url = "https://github.com/Robje007/OpenProtonSync/releases/download/v${version}/openprotonsync-${target}.tar.gz";
             hash = hashes.${system};
           };
 
@@ -74,17 +74,17 @@
 
           installPhase = ''
             runHook preInstall
-            install -Dm755 proton-drive-sync $out/bin/proton-drive-sync
+            install -Dm755 openprotonsync $out/bin/openprotonsync
             runHook postInstall
           '';
 
           meta = with pkgs.lib; {
             description = "Sync local directories to Proton Drive cloud storage";
-            homepage = "https://github.com/Robje007/proton-drive-sync";
+            homepage = "https://github.com/Robje007/OpenProtonSync";
             license = licenses.gpl3Only;
             maintainers = [ ];
             platforms = supportedSystems;
-            mainProgram = "proton-drive-sync";
+            mainProgram = "openprotonsync";
           };
         };
     in
@@ -95,8 +95,8 @@
       in
       {
         packages = {
-          proton-drive-sync = mkPackage pkgs system;
-          default = self.packages.${system}.proton-drive-sync;
+          openprotonsync = mkPackage pkgs system;
+          default = self.packages.${system}.openprotonsync;
         };
 
         devShells.default = pkgs.mkShell {
@@ -111,7 +111,7 @@
             ];
 
           shellHook = ''
-            echo "proton-drive-sync dev shell"
+            echo "openprotonsync dev shell"
             echo "  bun: $(bun --version)"
             echo "  node: $(node --version)"
           '';
@@ -120,7 +120,7 @@
     )
     // {
       overlays.default = final: _prev: {
-        proton-drive-sync = mkPackage final final.stdenv.hostPlatform.system;
+        openprotonsync = mkPackage final final.stdenv.hostPlatform.system;
       };
     };
 }

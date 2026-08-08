@@ -6,7 +6,7 @@
 #   BINARY_PATH - Path to the binary to package
 #
 # Optional environment variables:
-#   PACKAGE_NAME - Package name (default: "proton-drive-sync")
+#   PACKAGE_NAME - Package name (default: "openprotonsync")
 #
 # Outputs:
 #   ${PACKAGE_NAME}-*.${ARCH}.rpm in current directory
@@ -21,7 +21,7 @@ for var in VERSION ARCH BINARY_PATH; do
 	fi
 done
 
-PACKAGE_NAME="${PACKAGE_NAME:-proton-drive-sync}"
+PACKAGE_NAME="${PACKAGE_NAME:-openprotonsync}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGING_DIR="$(dirname "${SCRIPT_DIR}")"
 
@@ -41,8 +41,8 @@ echo "Building .rpm package: ${PACKAGE_NAME}-${RPM_VERSION}-${RPM_RELEASE}.${ARC
 mkdir -p rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 # Copy binary and spec file
-cp "${BINARY_PATH}" rpmbuild/SOURCES/proton-drive-sync
-cp "${PACKAGING_DIR}/rpm/proton-drive-sync.spec" rpmbuild/SPECS/
+cp "${BINARY_PATH}" rpmbuild/SOURCES/openprotonsync
+cp "${PACKAGING_DIR}/rpm/openprotonsync.spec" rpmbuild/SPECS/
 
 # Build the package
 rpmbuild --define "_topdir $(pwd)/rpmbuild" \
@@ -50,7 +50,7 @@ rpmbuild --define "_topdir $(pwd)/rpmbuild" \
 	--define "_version ${RPM_VERSION}" \
 	--define "_release ${RPM_RELEASE}" \
 	--target "${ARCH}" \
-	-bb rpmbuild/SPECS/proton-drive-sync.spec
+	-bb rpmbuild/SPECS/openprotonsync.spec
 
 # Copy to current directory
 RPM_FILE=$(find rpmbuild/RPMS/${ARCH}/ -name "*.rpm" | head -1)

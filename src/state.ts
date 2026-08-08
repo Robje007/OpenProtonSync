@@ -1,7 +1,7 @@
 /**
- * Proton Drive Sync - State Management
+ * OpenProtonSync - State Management
  *
- * Persists sync state to ~/.local/state/proton-drive-sync/state.db using SQLite.
+ * Persists sync state to ~/.local/state/openprotonsync/state.db using SQLite.
  * Snapshot management is handled by the watcher module.
  */
 

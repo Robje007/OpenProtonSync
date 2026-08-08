@@ -6,7 +6,7 @@
 #   BINARY_PATH - Path to the binary to package
 #
 # Optional environment variables:
-#   PACKAGE_NAME - Package name (default: "proton-drive-sync")
+#   PACKAGE_NAME - Package name (default: "openprotonsync")
 #
 # Outputs:
 #   ${PACKAGE_NAME}_${VERSION}_${ARCH}.deb in current directory
@@ -21,7 +21,7 @@ for var in VERSION ARCH BINARY_PATH; do
 	fi
 done
 
-PACKAGE_NAME="${PACKAGE_NAME:-proton-drive-sync}"
+PACKAGE_NAME="${PACKAGE_NAME:-openprotonsync}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGING_DIR="$(dirname "${SCRIPT_DIR}")"
 PKG_DIR="deb-${ARCH}"
@@ -33,8 +33,8 @@ echo "Building .deb package: ${DEB_FILE}"
 mkdir -p "${PKG_DIR}/DEBIAN" "${PKG_DIR}/usr/bin"
 
 # Copy binary
-cp "${BINARY_PATH}" "${PKG_DIR}/usr/bin/proton-drive-sync"
-chmod 755 "${PKG_DIR}/usr/bin/proton-drive-sync"
+cp "${BINARY_PATH}" "${PKG_DIR}/usr/bin/openprotonsync"
+chmod 755 "${PKG_DIR}/usr/bin/openprotonsync"
 
 # Generate control file from template
 sed -e "s/{{VERSION}}/${VERSION}/" \

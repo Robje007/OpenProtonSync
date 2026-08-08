@@ -14,7 +14,7 @@ import { logger } from '../logger.js';
 export function pauseCommand(): void {
   // Check if a sync process is running first
   if (!isAlreadyRunning()) {
-    logger.info('No running proton-drive-sync process found.');
+    logger.info('No running openprotonsync process found.');
     return;
   }
 

@@ -156,7 +156,7 @@ export function snapshot(): DashboardSnapshot {
 // Constants
 // ============================================================================
 
-const LOG_FILE = join(xdgState || '', 'proton-drive-sync', 'sync.log');
+const LOG_FILE = join(xdgState || '', 'openprotonsync', 'sync.log');
 
 // Store initial log position at subprocess startup (so refreshes get all session logs)
 let initialLogPosition = 0;
@@ -377,7 +377,7 @@ function renderStopSection(syncStatus: string): string {
       <div class="relative group flex items-center">
         ${icon('info', 'w-4 h-4 text-gray-500 cursor-help')}
         <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-xs text-gray-300 w-96 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-          You can start it again with <code class="bg-gray-800 px-1 py-0.5 rounded font-mono">proton-drive-sync start</code>
+          You can start it again with <code class="bg-gray-800 px-1 py-0.5 rounded font-mono">openprotonsync start</code>
         </div>
       </div>
     </div>
@@ -718,7 +718,7 @@ function getWebAuthRequestInfo(request: Request): WebAuthRequestInfo {
     forwardedHost: headers.get('x-forwarded-host'),
     forwardedProto: headers.get('x-forwarded-proto'),
     fetchSite: headers.get('sec-fetch-site'),
-    marker: headers.get('x-proton-drive-sync'),
+    marker: headers.get('x-openprotonsync'),
   };
 }
 

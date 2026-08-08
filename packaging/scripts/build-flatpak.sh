@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# Build Flatpak package for proton-drive-sync
+# Build Flatpak package for openprotonsync
 #
 # Required environment variables:
 #   VERSION     - Package version (e.g., 1.0.0)
@@ -18,13 +18,13 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-APP_ID="io.github.damianbbitflipper.ProtonDriveSync"
+APP_ID="io.github.robje007.OpenProtonSync"
 
 # Determine output filename based on prerelease status
 if [ "${PRERELEASE}" = "true" ]; then
-	OUTPUT_NAME="Proton_Drive_Sync-Prerelease-${VERSION}-${ARCH}.flatpak"
+	OUTPUT_NAME="OpenProtonSync-Prerelease-${VERSION}-${ARCH}.flatpak"
 else
-	OUTPUT_NAME="Proton_Drive_Sync-${VERSION}-${ARCH}.flatpak"
+	OUTPUT_NAME="OpenProtonSync-${VERSION}-${ARCH}.flatpak"
 fi
 
 echo "Building Flatpak: ${OUTPUT_NAME}"
@@ -38,8 +38,8 @@ mkdir -p "${BUILD_DIR}"
 cp "${REPO_ROOT}/packaging/flatpak/${APP_ID}.yml.template" "${BUILD_DIR}/${APP_ID}.yml"
 
 # Copy binary
-cp "${BINARY_PATH}" "${BUILD_DIR}/proton-drive-sync"
-chmod +x "${BUILD_DIR}/proton-drive-sync"
+cp "${BINARY_PATH}" "${BUILD_DIR}/openprotonsync"
+chmod +x "${BUILD_DIR}/openprotonsync"
 
 # Copy desktop file
 cp "${REPO_ROOT}/packaging/flatpak/${APP_ID}.desktop" "${BUILD_DIR}/"

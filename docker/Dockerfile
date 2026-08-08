@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy built binary from builder stage
-COPY --from=builder /app/dist/proton-drive-sync /usr/local/bin/
+COPY --from=builder /app/dist/openprotonsync /usr/local/bin/
 
 # Copy entrypoint script
 COPY docker/entrypoint.sh /entrypoint.sh
@@ -48,6 +48,6 @@ EXPOSE 4242
 
 # Health check: verify sync process is running
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD proton-drive-sync status > /dev/null 2>&1 || exit 1
+    CMD openprotonsync status > /dev/null 2>&1 || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]

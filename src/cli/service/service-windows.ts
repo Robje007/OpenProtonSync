@@ -8,7 +8,7 @@ import { logger } from '../../logger.js';
 import { setFlag, clearFlag, FLAGS } from '../../flags.js';
 import type { ServiceOperations } from './types.js';
 
-const TASK_NAME = 'ProtonDriveSync';
+const TASK_NAME = 'OpenProtonSync';
 
 interface SchtasksResult {
   success: boolean;
@@ -50,10 +50,10 @@ async function install(binPath: string): Promise<boolean> {
 
     // Auto-start the service (same behavior as macOS/Linux)
     if (load()) {
-      logger.info('proton-drive-sync service installed and started.');
+      logger.info('openprotonsync service installed and started.');
       return true;
     } else {
-      logger.error('proton-drive-sync service installed but failed to start.');
+      logger.error('openprotonsync service installed but failed to start.');
       return false;
     }
   } else {

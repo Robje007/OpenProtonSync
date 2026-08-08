@@ -86,7 +86,7 @@ async function resetInteractive(): Promise<void> {
 async function resetSyncState(): Promise<void> {
   const confirmed = await confirm({
     message:
-      'This will reset the sync state, forcing proton-drive-sync to sync all files as if it were first launched. Continue?',
+      'This will reset the sync state, forcing openprotonsync to sync all files as if it were first launched. Continue?',
     default: false,
   });
 
@@ -160,7 +160,7 @@ async function clearSignals(): Promise<void> {
  */
 async function purgeCommand(): Promise<void> {
   logger.info('');
-  logger.info('Purging proton-drive-sync...');
+  logger.info('Purging openprotonsync...');
   logger.info('');
 
   // Step 1: Uninstall service (non-interactive, ignore errors)
@@ -207,5 +207,5 @@ async function purgeCommand(): Promise<void> {
   }
 
   logger.info('');
-  logger.info('Purge complete. All proton-drive-sync data has been removed.');
+  logger.info('Purge complete. All openprotonsync data has been removed.');
 }

@@ -1,5 +1,5 @@
 /**
- * Proton Drive Sync - Node Mapping Storage
+ * OpenProtonSync - Node Mapping Storage
  *
  * Tracks the mapping between local paths and Proton Drive nodeUids.
  * Used to support efficient rename/move operations without re-uploading.

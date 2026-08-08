@@ -1,5 +1,5 @@
 /**
- * Proton Drive Sync - Signal Management
+ * OpenProtonSync - Signal Management
  *
  * Signals: Transient inter-process communication via a queue stored in SQLite.
  * Uses EventEmitter for 1-to-N in-process signal broadcasting.

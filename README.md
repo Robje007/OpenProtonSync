@@ -10,13 +10,12 @@ safer backup controls, and an opt-in **two-way sync beta**.
 > OpenProtonSync is an independent GPL-3.0 fork. Credit for the original project goes to the
 > [proton-drive-sync contributors](https://github.com/DamianB-BitFlipper/proton-drive-sync/graphs/contributors).
 > It is not affiliated with or endorsed by Proton AG. Please report OpenProtonSync issues in
-> [this repository](https://github.com/Robje007/proton-drive-sync/issues), not to the upstream project.
+> [this repository](https://github.com/Robje007/OpenProtonSync/issues), not to the upstream project.
 
 If OpenProtonSync is useful to you, you can [support its development on Ko-fi](https://ko-fi.com/robje007).
 
-The existing `proton-drive-sync` command, package names, container image, and configuration paths
-are retained for backwards-compatible upgrades. OpenProtonSync is the product name shown in the
-documentation and interface.
+The application, CLI, packages, container image, services, and configuration paths all use the
+OpenProtonSync name.
 
 ## Features
 
@@ -42,13 +41,13 @@ openssl rand -base64 32
 Paste that key directly into this Compose configuration—no separate `.env` file is required:
 
 ```yaml
-name: proton-drive-sync
+name: openprotonsync
 
 services:
-  proton-drive-sync:
-    image: ghcr.io/robje007/proton-drive-sync:latest
+  openprotonsync:
+    image: ghcr.io/robje007/openprotonsync:latest
     pull_policy: always
-    container_name: proton-drive-sync
+    container_name: openprotonsync
     restart: unless-stopped
 
     environment:
@@ -60,16 +59,23 @@ services:
       - '4242:4242'
 
     volumes:
-      - proton-drive-config:/config/proton-drive-sync
-      - proton-drive-state:/state/proton-drive-sync
+      - openprotonsync-config:/config/openprotonsync
+      - openprotonsync-state:/state/openprotonsync
       - /path/on/your/host:/data/files
 
     stop_grace_period: 30s
 
 volumes:
-  proton-drive-config:
-  proton-drive-state:
+  openprotonsync-config:
+  openprotonsync-state:
 ```
+
+When upgrading from the original package name, migrate the contents of the old config and state
+volumes to `openprotonsync-config` and `openprotonsync-state` before removing the old container.
+Keep the same `KEYRING_PASSWORD`, otherwise stored Proton credentials cannot be decrypted.
+
+Native installations automatically copy legacy configuration, state, and desktop keychain
+credentials into the new OpenProtonSync locations on first launch.
 
 Keep `KEYRING_PASSWORD` unchanged after authentication. Anyone who can read the Compose YAML can
 read this key, so restrict access to the configuration and never commit it.
@@ -78,8 +84,8 @@ Start the container:
 
 ```bash
 sudo docker compose up -d
-sudo docker exec -it proton-drive-sync proton-drive-sync auth
-sudo docker logs --tail 100 -f proton-drive-sync
+sudo docker exec -it openprotonsync openprotonsync auth
+sudo docker logs --tail 100 -f openprotonsync
 ```
 
 The service notices saved authentication automatically; a restart after `auth` is not required.
@@ -97,13 +103,13 @@ Use the path **inside the container**. With `/path/on/your/host:/data/files`, th
 Authentication is performed in the CLI, not on the normal dashboard page. For Docker, run:
 
 ```bash
-sudo docker exec -it proton-drive-sync proton-drive-sync auth
+sudo docker exec -it openprotonsync openprotonsync auth
 ```
 
 For a native installation, run:
 
 ```bash
-proton-drive-sync auth
+openprotonsync auth
 ```
 
 The command asks for your Proton username or email address and account password. Depending on your
@@ -123,10 +129,10 @@ re-authenticate. To sign out and remove the stored session, run:
 
 ```bash
 # Docker
-sudo docker exec -it proton-drive-sync proton-drive-sync auth --logout
+sudo docker exec -it openprotonsync openprotonsync auth --logout
 
 # Native installation
-proton-drive-sync auth --logout
+openprotonsync auth --logout
 ```
 
 The optional browser sign-in described below is disabled by default. It is intended for remotely
@@ -146,7 +152,7 @@ a direction remain upload-only after upgrading.
 For a new native or Docker CLI mapping, add `--two-way`:
 
 ```bash
-sudo docker exec proton-drive-sync proton-drive-sync config sync-dir \
+sudo docker exec openprotonsync openprotonsync config sync-dir \
   --add /data/files --remote /Backups --two-way
 ```
 
@@ -174,7 +180,7 @@ image upgrade preserves them:
 ```bash
 sudo docker compose pull
 sudo docker compose up -d
-sudo docker logs --tail 100 -f proton-drive-sync
+sudo docker logs --tail 100 -f openprotonsync
 ```
 
 Do **not** run `sudo docker compose down -v`; `-v` deletes the named volumes. Also keep the existing
@@ -183,28 +189,28 @@ Do **not** run `sudo docker compose down -v`; `-v` deletes the named volumes. Al
 To confirm the running image:
 
 ```bash
-sudo docker inspect proton-drive-sync --format '{{.Config.Image}}'
-sudo docker exec proton-drive-sync proton-drive-sync --version
+sudo docker inspect openprotonsync --format '{{.Config.Image}}'
+sudo docker exec openprotonsync openprotonsync --version
 ```
 
 ## Useful Docker commands
 
 ```bash
 # Show mappings
-sudo docker exec proton-drive-sync proton-drive-sync config sync-dir --list
+sudo docker exec openprotonsync openprotonsync config sync-dir --list
 
 # Show exclusions
-sudo docker exec proton-drive-sync proton-drive-sync config exclude --list
+sudo docker exec openprotonsync openprotonsync config exclude --list
 
 # Authenticate again
-sudo docker exec -it proton-drive-sync proton-drive-sync auth
+sudo docker exec -it openprotonsync openprotonsync auth
 
 # Safely clear a verified stale process lock
-sudo docker exec proton-drive-sync proton-drive-sync unlock
+sudo docker exec openprotonsync openprotonsync unlock
 
 # Restart and follow logs
-sudo docker restart proton-drive-sync
-sudo docker logs --tail 100 -f proton-drive-sync
+sudo docker restart openprotonsync
+sudo docker logs --tail 100 -f openprotonsync
 ```
 
 ## Optional dashboard sign-in
@@ -235,18 +241,18 @@ Docker works well on a server or NAS, but the application is not Docker-only. A 
 by `keytar`.
 
 ```bash
-git clone https://github.com/Robje007/proton-drive-sync.git
-cd proton-drive-sync
+git clone https://github.com/Robje007/OpenProtonSync.git
+cd openprotonsync
 bun install
 bun run build
 bun link
-proton-drive-sync auth
-proton-drive-sync config
-proton-drive-sync start
+openprotonsync auth
+openprotonsync config
+openprotonsync start
 ```
 
 Native configuration is stored below the normal platform config/state directories. Run
-`proton-drive-sync config --help` for non-interactive commands and `proton-drive-sync start --help`
+`openprotonsync config --help` for non-interactive commands and `openprotonsync start --help`
 for one-shot, watch, dry-run, and service options.
 
 ## Exclusions
@@ -273,9 +279,9 @@ Exclusions can be scoped to one selected backup mapping. Patterns are relative g
 every depth within that mapping:
 
 ```bash
-proton-drive-sync config exclude --path /data/photos --add private '*.tmp' '**/*.raw'
-proton-drive-sync config exclude --path /data/photos --list
-proton-drive-sync config exclude --path /data/photos --remove '*.tmp'
+openprotonsync config exclude --path /data/photos --add private '*.tmp' '**/*.raw'
+openprotonsync config exclude --path /data/photos --list
+openprotonsync config exclude --path /data/photos --remove '*.tmp'
 ```
 
 Use `/` as the path to apply a pattern to every configured backup mapping.
@@ -302,7 +308,7 @@ is actually active, use the `unlock` command shown above.
 
 ### “Refresh token expired”
 
-Run `proton-drive-sync auth` again. In Docker, the container stays online and checks for updated
+Run `openprotonsync auth` again. In Docker, the container stays online and checks for updated
 credentials once per minute without flooding its logs.
 
 ### Dashboard is not reachable

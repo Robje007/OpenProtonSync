@@ -1,5 +1,5 @@
 /**
- * Proton Drive Sync - Status Command
+ * OpenProtonSync - Status Command
  *
  * Returns JSON status of the sync service
  */

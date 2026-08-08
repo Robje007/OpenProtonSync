@@ -4,22 +4,22 @@ This file provides guidance for AI coding agents working in this repository.
 
 ## Project Overview
 
-Proton Drive Sync is a macOS CLI tool that syncs local directories to Proton Drive cloud storage. Built with Bun/TypeScript, it uses Node's fs.watch for file system monitoring, SQLite (via Drizzle ORM) for state management, and the Proton Drive SDK for cloud operations.
+OpenProtonSync is a macOS CLI tool that syncs local directories to Proton Drive cloud storage. Built with Bun/TypeScript, it uses Node's fs.watch for file system monitoring, SQLite (via Drizzle ORM) for state management, and the Proton Drive SDK for cloud operations.
 
 ## Build & Run Commands
 
-| Command                   | Description                                           |
-| ------------------------- | ----------------------------------------------------- |
-| `make install`            | Install dependencies                                  |
-| `make build`              | Compile standalone binary to `dist/proton-drive-sync` |
-| `make build-check`        | Type-check without emitting files                     |
-| `make run ARGS="<cmd>"`   | Run one-off command (e.g., `make run ARGS="status"`)  |
-| `make dev`                | Run with auto-reload on file changes (watch mode)     |
-| `make dev ARGS="--debug"` | Run dev mode with debug logging                       |
-| `make pre-commit`         | Run eslint --fix, prettier, and type-check            |
-| `make db-inspect`         | Open Drizzle Studio to inspect SQLite database        |
-| `make clean`              | Remove `dist/` build artifacts                        |
-| `make help`               | Show all available make commands                      |
+| Command                   | Description                                          |
+| ------------------------- | ---------------------------------------------------- |
+| `make install`            | Install dependencies                                 |
+| `make build`              | Compile standalone binary to `dist/openprotonsync`   |
+| `make build-check`        | Type-check without emitting files                    |
+| `make run ARGS="<cmd>"`   | Run one-off command (e.g., `make run ARGS="status"`) |
+| `make dev`                | Run with auto-reload on file changes (watch mode)    |
+| `make dev ARGS="--debug"` | Run dev mode with debug logging                      |
+| `make pre-commit`         | Run eslint --fix, prettier, and type-check           |
+| `make db-inspect`         | Open Drizzle Studio to inspect SQLite database       |
+| `make clean`              | Remove `dist/` build artifacts                       |
+| `make help`               | Show all available make commands                     |
 
 ### Pre-commit Hook
 
@@ -159,9 +159,9 @@ function getErrorMessage(error: unknown): string {
 
 ```typescript
 /**
- * Proton Drive Sync - Configuration
+ * OpenProtonSync - Configuration
  *
- * Reads config from ~/.config/proton-drive-sync/config.json
+ * Reads config from ~/.config/openprotonsync/config.json
  * Supports hot-reloading via namespaced signals
  */
 

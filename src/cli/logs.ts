@@ -1,5 +1,5 @@
 /**
- * Logs command to view proton-drive-sync logs
+ * Logs command to view openprotonsync logs
  */
 
 import { existsSync, readFileSync, unlinkSync } from 'fs';

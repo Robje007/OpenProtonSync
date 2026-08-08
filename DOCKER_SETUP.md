@@ -3,7 +3,7 @@
 The published image supports Linux AMD64 and ARM64:
 
 ```text
-ghcr.io/robje007/proton-drive-sync:latest
+ghcr.io/robje007/openprotonsync:latest
 ```
 
 Docker is recommended for NAS installations. For native source builds, see the main
@@ -23,10 +23,10 @@ Paste it directly into the configuration if you do not want a separate `.env` fi
 name: proton-nas-sync
 
 services:
-  proton-drive-sync:
-    image: ghcr.io/robje007/proton-drive-sync:latest
+  openprotonsync:
+    image: ghcr.io/robje007/openprotonsync:latest
     pull_policy: always
-    container_name: proton-drive-sync
+    container_name: openprotonsync
     restart: unless-stopped
 
     environment:
@@ -38,15 +38,15 @@ services:
       - '4242:4242'
 
     volumes:
-      - proton-drive-config:/config/proton-drive-sync
-      - proton-drive-state:/state/proton-drive-sync
+      - openprotonsync-config:/config/openprotonsync
+      - openprotonsync-state:/state/openprotonsync
       - /your/host/folder:/data/files
 
     stop_grace_period: 30s
 
 volumes:
-  proton-drive-config:
-  proton-drive-state:
+  openprotonsync-config:
+  openprotonsync-state:
 ```
 
 The direct key is stored as plain text in the Compose definition. Restrict access to the file or
@@ -57,13 +57,13 @@ NAS project configuration. An `.env` reference remains available as an optional 
 ```bash
 sudo docker compose pull
 sudo docker compose up -d
-sudo docker logs --tail 100 -f proton-drive-sync
+sudo docker logs --tail 100 -f openprotonsync
 ```
 
 Authenticate in the terminal:
 
 ```bash
-sudo docker exec -it proton-drive-sync proton-drive-sync auth
+sudo docker exec -it openprotonsync openprotonsync auth
 ```
 
 The running service detects credentials without a restart. Open `http://localhost:4242` or use the
@@ -112,26 +112,26 @@ headers are trusted.
 
 ## Persistent volumes
 
-| Container path              | Contents                                |
-| --------------------------- | --------------------------------------- |
-| `/config/proton-drive-sync` | Configuration and encrypted credentials |
-| `/state/proton-drive-sync`  | SQLite state, queues, locks, and logs   |
-| `/data/...`                 | Mounted local files                     |
+| Container path           | Contents                                |
+| ------------------------ | --------------------------------------- |
+| `/config/openprotonsync` | Configuration and encrypted credentials |
+| `/state/openprotonsync`  | SQLite state, queues, locks, and logs   |
+| `/data/...`              | Mounted local files                     |
 
 Back up the config volume together with the separately stored encryption key. Never publish either.
 
 ## Useful commands
 
 ```bash
-sudo docker exec proton-drive-sync proton-drive-sync --version
-sudo docker exec proton-drive-sync proton-drive-sync status
-sudo docker exec proton-drive-sync proton-drive-sync config sync-dir --list
-sudo docker exec proton-drive-sync proton-drive-sync config exclude --list
-sudo docker exec proton-drive-sync proton-drive-sync pause
-sudo docker exec proton-drive-sync proton-drive-sync resume
-sudo docker exec proton-drive-sync proton-drive-sync reconcile
-sudo docker exec proton-drive-sync proton-drive-sync unlock
-sudo docker logs --tail 200 -f proton-drive-sync
+sudo docker exec openprotonsync openprotonsync --version
+sudo docker exec openprotonsync openprotonsync status
+sudo docker exec openprotonsync openprotonsync config sync-dir --list
+sudo docker exec openprotonsync openprotonsync config exclude --list
+sudo docker exec openprotonsync openprotonsync pause
+sudo docker exec openprotonsync openprotonsync resume
+sudo docker exec openprotonsync openprotonsync reconcile
+sudo docker exec openprotonsync openprotonsync unlock
+sudo docker logs --tail 200 -f openprotonsync
 ```
 
 ## Updating
@@ -154,7 +154,7 @@ vendor-supported mechanism.
 ### Local path does not exist
 
 ```bash
-sudo docker exec proton-drive-sync ls -la /data
+sudo docker exec openprotonsync ls -la /data
 ```
 
 Use the displayed container path in the dashboard.
@@ -164,14 +164,14 @@ Use the displayed container path in the dashboard.
 Confirm that the correct config volume and original `KEYRING_PASSWORD` are configured. Then run:
 
 ```bash
-sudo docker exec -it proton-drive-sync proton-drive-sync auth
+sudo docker exec -it openprotonsync openprotonsync auth
 ```
 
 ### Stale process lock
 
 ```bash
-sudo docker exec proton-drive-sync proton-drive-sync status
-sudo docker exec proton-drive-sync proton-drive-sync unlock
+sudo docker exec openprotonsync openprotonsync status
+sudo docker exec openprotonsync openprotonsync unlock
 ```
 
 The unlock command refuses to remove the lock of a verified live process.
