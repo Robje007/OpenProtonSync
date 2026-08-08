@@ -53,7 +53,7 @@ before replacing an existing Docker deployment.
 - Remote deletes move the local copy to `.proton-sync-recovery`.
 - Dashboard for mappings, queues, logs, pause/resume, and optional username/password protection.
 - Per-mapping folder and file exclusions, editable from both the dashboard and interactive CLI.
-- Large-tree scanning with useful defaults such as `node_modules` and `.venv` exclusions.
+- User-controlled exclusion patterns for large generated directories such as `node_modules`.
 - Docker images for AMD64 and ARM64, plus native CLI support.
 - Official `@protontech/drive-sdk` 0.19.2 integration.
 
@@ -284,7 +284,8 @@ for one-shot, watch, dry-run, and service options.
 
 ## Exclusions
 
-New configurations exclude common generated dependency directories:
+The configurable exclusion list starts empty: OpenProtonSync does not decide which of your regular
+folders or files should be skipped. Add only the patterns you want, for example:
 
 ```text
 node_modules
@@ -296,8 +297,9 @@ __pycache__
 venv
 ```
 
-Your source, dotfiles, and `.git` directory remain included unless you exclude them yourself. Large
-generated directories should be excluded instead of synchronized.
+Existing configurations containing exactly the former automatically generated list are cleared on
+upgrade. Customized lists are preserved. Your source, dotfiles, and `.git` directory remain included
+unless you exclude them yourself. Consider excluding large generated directories when appropriate.
 
 Platform recycle folders such as `#recycle`, `$RECYCLE.BIN`, `.Trash`, and `.Trashes` are always
 excluded, including when an older configuration contains an explicitly empty exclusion list.

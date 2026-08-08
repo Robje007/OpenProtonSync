@@ -80,12 +80,7 @@ export const AddDirectoryModal: FC = () => {
             ></textarea>
             <p class="mt-2 text-xs text-gray-500">
               Optional. Enter one relative glob pattern per line. Patterns apply only to this backup
-              mapping.
-            </p>
-            <p class="mt-2 text-xs text-gray-500">
-              Global defaults such as <code>node_modules</code>, <code>.npm</code>,{' '}
-              <code>.pnpm-store</code>, <code>.yarn/cache</code>, <code>__pycache__</code>,{' '}
-              <code>.venv</code>, and <code>venv</code> already apply automatically.
+              mapping. The list starts empty so you decide what is excluded.
             </p>
           </div>
 
