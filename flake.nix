@@ -15,7 +15,7 @@
     let
       # Version and platform-specific hashes for pre-built binaries.
       # These are updated automatically by CI on each stable release.
-      version = "1.0.1";
+      version = "1.0.0";
       hashes = {
         x86_64-linux = "sha256-vV01c0WZeIjKyG1ER0bp56Pl5l1puPFZl1SMNli32T0=";
         aarch64-linux = "sha256-NKi4GutP6w/kr4LpTfM3GR3afSGjERM7jGJvAN2Z0AY=";
