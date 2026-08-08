@@ -54,8 +54,11 @@ export const PendingQueue: FC<Props> = ({ jobs, count, limit }) => {
                   <span class="block truncate text-xs font-medium text-slate-300">
                     {formatPath(job.localPath)}
                   </span>
-                  <span class="mt-0.5 block truncate font-mono text-[10px] text-slate-600">
-                    {job.remotePath}
+                  <span
+                    class="mt-0.5 block truncate font-mono text-[10px] text-slate-600"
+                    title={`${job.localPath} → ${job.remotePath || '/'}`}
+                  >
+                    {job.localPath} → {job.remotePath || '/'}
                   </span>
                 </div>
               </div>

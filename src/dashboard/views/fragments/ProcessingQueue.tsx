@@ -85,8 +85,11 @@ export const ProcessingQueue: FC<Props> = ({
                     <div class="truncate text-xs font-medium text-slate-200">
                       {formatPath(job.localPath)}
                     </div>
-                    <div class="mt-1 truncate font-mono text-[10px] text-slate-500">
-                      {job.remotePath}
+                    <div
+                      class="mt-1 truncate font-mono text-[10px] text-slate-500"
+                      title={`${job.localPath} → ${job.remotePath || '/'}`}
+                    >
+                      {job.localPath} → {job.remotePath || '/'}
                     </div>
                   </div>
                 </div>
