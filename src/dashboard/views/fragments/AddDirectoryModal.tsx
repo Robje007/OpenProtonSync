@@ -70,6 +70,20 @@ export const AddDirectoryModal: FC = () => {
             </p>
           </div>
 
+          <div class="mb-6">
+            <label class="block text-xs text-gray-500 mb-1">Exclude folders/files</label>
+            <textarea
+              name="exclude_globs"
+              placeholder={'private\n*.tmp\n**/*.raw'}
+              rows={3}
+              class="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-proton"
+            ></textarea>
+            <p class="mt-2 text-xs text-gray-500">
+              Optional. Enter one relative glob pattern per line. Patterns apply only to this backup
+              mapping.
+            </p>
+          </div>
+
           {/* Buttons */}
           <div class="flex justify-end gap-3">
             <button

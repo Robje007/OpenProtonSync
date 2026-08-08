@@ -29,6 +29,27 @@ describe('exclusions', () => {
     expect(validateGlob('/node_modules').valid).toBe(false);
   });
 
+  test('applies exclusions only to the selected backup mapping', () => {
+    const scoped = [{ path: '/data/photos', globs: ['private', '*.tmp'] }];
+
+    expect(isPathExcluded('/data/photos/private/image.jpg', '/data/photos', scoped)).toBe(true);
+    expect(isPathExcluded('/data/photos/upload.tmp', '/data/photos', scoped)).toBe(true);
+    expect(isPathExcluded('/data/documents/private/notes.txt', '/data/documents', scoped)).toBe(
+      false
+    );
+  });
+
+  test('handles mapping-specific exclusions with Windows paths', () => {
+    const scoped = [{ path: 'C:\\Backups\\Photos', globs: ['private'] }];
+
+    expect(
+      isPathExcluded('C:\\Backups\\Photos\\private\\image.jpg', 'C:\\Backups\\Photos', scoped)
+    ).toBe(true);
+    expect(
+      isPathExcluded('C:\\Backups\\Documents\\private\\notes.txt', 'C:\\Backups\\Documents', scoped)
+    ).toBe(false);
+  });
+
   test('always excludes two-way safety folders', () => {
     expect(
       isPathExcluded('/data/Projects/.proton-sync-conflicts/2026/file.txt', '/data/Projects', [])

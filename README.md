@@ -17,7 +17,8 @@ If Proton Drive Sync is useful to you, you can [support its development on Ko-fi
 - Atomic downloads: a partial download never replaces the destination file.
 - Simultaneous edits keep both versions in `.proton-sync-conflicts`.
 - Remote deletes move the local copy to `.proton-sync-recovery`.
-- Dashboard for mappings, queues, logs, pause/resume, and optional secure sign-in.
+- Dashboard for mappings, queues, logs, pause/resume, and optional username/password protection.
+- Per-mapping folder and file exclusions, editable from both the dashboard and interactive CLI.
 - Large-tree scanning with useful defaults such as `node_modules` and `.venv` exclusions.
 - Docker images for AMD64 and ARM64, plus native CLI support.
 - Official `@protontech/drive-sdk` 0.19.2 integration.
@@ -82,6 +83,47 @@ Open `http://localhost:4242` (or use the server's hostname/IP) and add a mapping
 
 Use the path **inside the container**. With `/path/on/your/host:/data/files`, the dashboard must use
 `/data/files`, not the host path.
+
+## Sign in to Proton
+
+Authentication is performed in the CLI, not on the normal dashboard page. For Docker, run:
+
+```bash
+sudo docker exec -it proton-drive-sync proton-drive-sync auth
+```
+
+For a native installation, run:
+
+```bash
+proton-drive-sync auth
+```
+
+The command asks for your Proton username or email address and account password. Depending on your
+account settings, it may then ask for:
+
+- A six-digit two-factor authentication code from your authenticator app. Security keys are not
+  currently supported by this client.
+- Your mailbox password when your Proton account uses two-password mode.
+
+Successful authentication ends with `Credentials saved securely.` The saved session is reused and
+refreshed automatically, so you do not need to enter your password every time the sync service
+starts. In Docker, the already-running service detects the new session automatically; no container
+restart is required.
+
+To replace an existing session, run the same `auth` command and confirm that you want to
+re-authenticate. To sign out and remove the stored session, run:
+
+```bash
+# Docker
+sudo docker exec -it proton-drive-sync proton-drive-sync auth --logout
+
+# Native installation
+proton-drive-sync auth --logout
+```
+
+The optional browser sign-in described below is disabled by default. It is intended for remotely
+authenticating an already-running Docker service; CLI authentication remains the simplest and most
+secure option.
 
 ## Upload-only or two-way beta
 
@@ -218,6 +260,26 @@ generated directories should be excluded instead of synchronized.
 
 Platform recycle folders such as `#recycle`, `$RECYCLE.BIN`, `.Trash`, and `.Trashes` are always
 excluded, including when an older configuration contains an explicitly empty exclusion list.
+
+Exclusions can be scoped to one selected backup mapping. Patterns are relative globs and apply at
+every depth within that mapping:
+
+```bash
+proton-drive-sync config exclude --path /data/photos --add private '*.tmp' '**/*.raw'
+proton-drive-sync config exclude --path /data/photos --list
+proton-drive-sync config exclude --path /data/photos --remove '*.tmp'
+```
+
+Use `/` as the path to apply a pattern to every configured backup mapping.
+
+## Protecting the dashboard
+
+The web interface can optionally require a username and password. Open **Settings → Dashboard
+security**, enable protection, and enter a username and a password of at least 12 characters. The
+setting protects dashboard pages, assets, event streams, and API endpoints.
+
+Only a salted scrypt password hash is stored in the configuration. HTTP Basic credentials are not
+encrypted in transit, so place the dashboard behind HTTPS when accessing it over a network.
 
 ## Troubleshooting
 

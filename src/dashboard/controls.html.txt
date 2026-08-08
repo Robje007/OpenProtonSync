@@ -25,6 +25,34 @@
     </div>
   </div>
 
+  <div>
+    <h2 class="text-2xl font-semibold text-white mb-2">Dashboard security</h2>
+    <p class="text-sm text-gray-400 mb-6">
+      Optionally require a username and password before the dashboard or its API can be accessed.
+    </p>
+    <form id="dashboard-auth-form" class="bg-gray-800 rounded-xl border border-gray-700 p-6 space-y-4">
+      <label class="flex items-center gap-3 text-sm text-gray-200">
+        <input id="dashboard-auth-enabled" type="checkbox" class="accent-proton" />
+        Protect the web interface
+      </label>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="dashboard-auth-username" class="block text-xs text-gray-500 mb-1">Username</label>
+          <input id="dashboard-auth-username" type="text" minlength="3" autocomplete="username" class="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-proton" />
+        </div>
+        <div>
+          <label for="dashboard-auth-password" class="block text-xs text-gray-500 mb-1">New password</label>
+          <input id="dashboard-auth-password" type="password" minlength="12" autocomplete="new-password" placeholder="Leave blank to keep current password" class="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-proton" />
+        </div>
+      </div>
+      <p class="text-xs text-amber-300/90">
+        Passwords must be at least 12 characters and are stored as a salted scrypt hash. Use HTTPS
+        when accessing the dashboard over a network.
+      </p>
+      <button type="submit" class="px-4 py-2 bg-proton hover:bg-proton-dark text-white text-sm font-medium rounded-lg transition-colors">Save dashboard security</button>
+    </form>
+  </div>
+
   <!-- Secure Proton authentication (explicit server-side opt-in) -->
   <div id="web-auth-section" class="hidden">
     <h2 class="text-2xl font-semibold text-white mb-2">Proton account</h2>

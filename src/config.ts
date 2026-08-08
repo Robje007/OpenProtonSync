@@ -37,6 +37,11 @@ export interface ExcludePattern {
   globs: string[];
 }
 
+export interface DashboardAuth {
+  username: string;
+  password_hash: string;
+}
+
 /** Behavior when a local file is deleted */
 export const RemoteDeleteBehavior = {
   TRASH: 'trash',
@@ -51,6 +56,7 @@ export interface Config {
   remote_delete_behavior: RemoteDeleteBehavior;
   dashboard_host: string;
   dashboard_port: number;
+  dashboard_auth?: DashboardAuth;
   exclude_patterns: ExcludePattern[];
 }
 
@@ -161,6 +167,19 @@ function parseConfig(throwOnError: boolean): Config | null {
     // Default dashboard_port if not set
     if (config.dashboard_port === undefined) {
       config.dashboard_port = DEFAULT_DASHBOARD_PORT;
+    }
+
+    if (
+      config.dashboard_auth !== undefined &&
+      (typeof config.dashboard_auth.username !== 'string' ||
+        !config.dashboard_auth.username.trim() ||
+        typeof config.dashboard_auth.password_hash !== 'string' ||
+        !config.dashboard_auth.password_hash.startsWith('scrypt$'))
+    ) {
+      const msg = 'Invalid dashboard authentication configuration';
+      if (throwOnError) throw new Error(msg);
+      logger.error(msg);
+      return null;
     }
 
     // Default exclude_patterns if not set. Existing explicit configurations are preserved.
@@ -293,6 +312,7 @@ function reloadConfig(): void {
     'remote_delete_behavior',
     'dashboard_host',
     'dashboard_port',
+    'dashboard_auth',
     'exclude_patterns',
   ];
   for (const key of keys) {
