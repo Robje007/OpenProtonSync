@@ -1,7 +1,7 @@
 /**
  * Stop Command
  *
- * Stops a running proton-drive-sync process gracefully.
+ * Stops a running openprotonsync process gracefully.
  */
 
 import { sendSignal } from '../signals.js';
@@ -16,7 +16,7 @@ import { logger } from '../logger.js';
 export function stopCommand(): void {
   // Check if a sync process is running first
   if (!isAlreadyRunning()) {
-    logger.info('No running proton-drive-sync process found.');
+    logger.info('No running openprotonsync process found.');
     return;
   }
 
@@ -31,7 +31,7 @@ export function stopCommand(): void {
 
   const waitForExit = (): void => {
     if (!isAlreadyRunning()) {
-      logger.info('proton-drive-sync stopped.');
+      logger.info('openprotonsync stopped.');
       return;
     }
 

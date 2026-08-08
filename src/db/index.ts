@@ -1,5 +1,5 @@
 /**
- * Proton Drive Sync - Database Connection
+ * OpenProtonSync - Database Connection
  *
  * SQLite database using Drizzle ORM for state persistence.
  */

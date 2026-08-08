@@ -10,10 +10,10 @@ import { logger } from '../../logger.js';
 import { getEffectiveHome, chownToEffectiveUser } from '../../paths.js';
 import type { ServiceOperations, ServiceResult } from './types.js';
 // @ts-expect-error Bun text imports
-import plistTemplate from './templates/proton-drive-sync.plist' with { type: 'text' };
+import plistTemplate from './templates/openprotonsync.plist' with { type: 'text' };
 
 const PLIST_DIR = join(getEffectiveHome(), 'Library', 'LaunchAgents');
-const SERVICE_NAME = 'com.damianb-bitflipper.proton-drive-sync';
+const SERVICE_NAME = 'com.robje007.openprotonsync';
 const PLIST_PATH = join(PLIST_DIR, `${SERVICE_NAME}.plist`);
 
 function generatePlist(binPath: string): string {
@@ -61,7 +61,7 @@ function loadService(name: string, plistPath: string): ServiceResult {
 
   return {
     success: false,
-    error: `Failed to bootstrap service: ${bootstrapStderr || `exit code ${bootstrap.exitCode}`}\nService may already be loaded. Try \`proton-drive-sync service unload\` then \`service load\`.`,
+    error: `Failed to bootstrap service: ${bootstrapStderr || `exit code ${bootstrap.exitCode}`}\nService may already be loaded. Try \`openprotonsync service unload\` then \`service load\`.`,
   };
 }
 
@@ -103,7 +103,7 @@ export const macosService: ServiceOperations = {
       chownToEffectiveUser(PLIST_DIR);
     }
 
-    logger.info('Installing proton-drive-sync service...');
+    logger.info('Installing openprotonsync service...');
     if (existsSync(PLIST_PATH)) {
       unloadServiceInternal(SERVICE_NAME, PLIST_PATH);
     }
@@ -113,10 +113,10 @@ export const macosService: ServiceOperations = {
     setFlag(FLAGS.SERVICE_INSTALLED);
 
     if (this.load()) {
-      logger.info('proton-drive-sync service installed and started.');
+      logger.info('openprotonsync service installed and started.');
       return true;
     } else {
-      logger.error('proton-drive-sync service installed but failed to start.');
+      logger.error('openprotonsync service installed but failed to start.');
       return false;
     }
   },
@@ -129,13 +129,13 @@ export const macosService: ServiceOperations = {
       return true;
     }
 
-    logger.info('Uninstalling proton-drive-sync service...');
+    logger.info('Uninstalling openprotonsync service...');
     if (!this.unload()) {
       logger.warn('Failed to unload service, continuing with uninstall...');
     }
     unlinkSync(PLIST_PATH);
     clearFlag(FLAGS.SERVICE_INSTALLED);
-    logger.info('proton-drive-sync service uninstalled.');
+    logger.info('openprotonsync service uninstalled.');
     return true;
   },
 

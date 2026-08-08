@@ -10,7 +10,7 @@ build-css:
 
 # Build standalone binary with bun (builds CSS first)
 build: build-css
-	bun build --compile --minify ./src/index.ts --outfile ./dist/proton-drive-sync
+	bun build --compile --minify ./src/index.ts --outfile ./dist/openprotonsync
 
 # Type-check without emitting files
 build-check:
@@ -42,7 +42,7 @@ clean:
 # Open Drizzle Studio to inspect the database
 # Checkpoint WAL first to ensure all writes are visible
 db-inspect:
-	@sqlite3 ~/.local/state/proton-drive-sync/state.db "PRAGMA wal_checkpoint(TRUNCATE);" 2>/dev/null || true
+	@sqlite3 ~/.local/state/openprotonsync/state.db "PRAGMA wal_checkpoint(TRUNCATE);" 2>/dev/null || true
 	bun drizzle-kit studio
 
 # Show available commands

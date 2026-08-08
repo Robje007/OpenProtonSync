@@ -32,11 +32,11 @@
       <h2 class="text-lg font-semibold text-white">Open source</h2>
       <p class="mt-4 text-sm leading-6 text-slate-400">
         Community-maintained and distributed under GPL-3.0. OpenProtonSync is a fork of the original
-        proton-drive-sync project and is not affiliated with or endorsed by Proton AG.
+        openprotonsync project and is not affiliated with or endorsed by Proton AG.
       </p>
       <div class="mt-5 flex flex-wrap gap-3">
         <a
-          href="https://github.com/Robje007/proton-drive-sync"
+          href="https://github.com/Robje007/OpenProtonSync"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-cyan-300 transition hover:bg-white/5"

@@ -151,7 +151,7 @@ export function startDashboard(config: Config, dryRun = false): void {
 
   logger.debug(`Dashboard starting with dryRun=${dryRun}`);
 
-  dashboardProcess = Bun.spawn(['proton-drive-sync', 'start', '--dashboard'], {
+  dashboardProcess = Bun.spawn(['openprotonsync', 'start', '--dashboard'], {
     stdin: 'pipe',
     stdout: 'pipe',
     stderr: 'inherit',

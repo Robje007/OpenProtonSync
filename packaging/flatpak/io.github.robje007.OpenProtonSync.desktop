@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=OpenProtonSync
 Comment=Sync local directories to Proton Drive cloud storage
-Exec=proton-drive-sync
-Icon=proton-drive-sync
+Exec=openprotonsync
+Icon=io.github.robje007.OpenProtonSync
 Type=Application
 Terminal=true
 Categories=Utility;Network;FileTransfer;

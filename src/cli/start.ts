@@ -68,7 +68,7 @@ async function authenticateWithStatus(
   const storedCreds = await getStoredCredentials();
   if (!storedCreds) {
     sendStatusToDashboard({ auth: { status: 'failed' } });
-    throw new Error('No credentials found. Run `proton-drive-sync auth` first.');
+    throw new Error('No credentials found. Run `openprotonsync auth` first.');
   }
 
   if (announceAttempt) logger.info('Authenticating with stored tokens...');
@@ -110,7 +110,7 @@ async function authenticateWithStatus(
   }
 }
 
-/** Keep a Docker dashboard alive while waiting for `proton-drive-sync auth`. */
+/** Keep a Docker dashboard alive while waiting for `openprotonsync auth`. */
 async function authenticateForRuntime(sdkDebug = false): Promise<ProtonDriveClient> {
   let waitingLogged = false;
 
@@ -124,7 +124,7 @@ async function authenticateForRuntime(sdkDebug = false): Promise<ProtonDriveClie
       if (!waitingLogged) {
         logger.warn(`Authentication unavailable: ${message}`);
         logger.info(
-          'Container is staying online. Run `proton-drive-sync auth`; syncing will start without a restart.'
+          'Container is staying online. Run `openprotonsync auth`; syncing will start without a restart.'
         );
         logger.info('Authentication will be checked again once per minute.');
         waitingLogged = true;
@@ -157,7 +157,7 @@ async function spawnDaemon(options: StartOptions): Promise<void> {
   // Clear any stale startup_ready flag from previous run
   clearFlag(FLAGS.STARTUP_READY);
 
-  const child = Bun.spawn(['proton-drive-sync', ...args], {
+  const child = Bun.spawn(['openprotonsync', ...args], {
     detached: true,
     stdio: ['ignore', 'ignore', 'inherit'], // stderr inherited for error visibility
     env: { ...process.env },
@@ -187,14 +187,14 @@ async function spawnDaemon(options: StartOptions): Promise<void> {
     } catch {
       process.stdout.write('\n');
       logger.error('Daemon process exited unexpectedly');
-      logger.info('Check logs with: proton-drive-sync logs');
+      logger.info('Check logs with: openprotonsync logs');
       process.exit(1);
     }
   }
 
   process.stdout.write('\n');
   logger.error('Daemon did not start within 30 seconds');
-  logger.info('Check logs with: proton-drive-sync logs');
+  logger.info('Check logs with: openprotonsync logs');
   process.exit(1);
 }
 
@@ -249,7 +249,7 @@ export async function startCommand(options: StartOptions): Promise<void> {
   // Load configuration
   const config = getConfig();
   if (!config) {
-    logger.error('No config file found. Run `proton-drive-sync init` first.');
+    logger.error('No config file found. Run `openprotonsync init` first.');
     process.exit(1);
   }
 
@@ -261,7 +261,7 @@ export async function startCommand(options: StartOptions): Promise<void> {
   // Acquire run lock (prevents multiple instances)
   const lockAcquired = acquireRunLock();
   if (!lockAcquired) {
-    logger.error('Another instance is already running. Use `proton-drive-sync stop` to stop it.');
+    logger.error('Another instance is already running. Use `openprotonsync stop` to stop it.');
     process.exit(1);
   }
 

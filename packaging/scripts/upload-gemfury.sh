@@ -5,11 +5,11 @@
 #   PACKAGES_DIR - Directory containing packages to upload
 #
 # Optional environment variables:
-#   GEMFURY_USERNAME - Gemfury username (default: damianb-bitflipper)
+#   GEMFURY_USERNAME - Gemfury username (default: robje007)
 
 set -euo pipefail
 
-GEMFURY_USERNAME="${GEMFURY_USERNAME:-damianb-bitflipper}"
+GEMFURY_USERNAME="${GEMFURY_USERNAME:-robje007}"
 
 # Validate required environment variables
 for var in GEMFURY_TOKEN PACKAGES_DIR; do

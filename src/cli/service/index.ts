@@ -21,7 +21,7 @@ function getBinPathSafe(): string | null {
 
   // Fallback to which/where for development mode
   const cmd = process.platform === 'win32' ? 'where' : 'which';
-  const result = Bun.spawnSync([cmd, 'proton-drive-sync']);
+  const result = Bun.spawnSync([cmd, 'openprotonsync']);
   if (result.exitCode !== 0) return null;
   const output = new TextDecoder().decode(result.stdout).trim();
   // 'where' on Windows may return multiple lines; take the first
@@ -72,14 +72,14 @@ export async function serviceInstallCommand(
   const binPath = getBinPathSafe();
   if (!binPath) {
     if (interactive) {
-      logger.error('proton-drive-sync not found in PATH.');
+      logger.error('openprotonsync not found in PATH.');
       if (process.platform === 'win32') {
         logger.error(
-          'Install with: irm https://www.damianb.dev/proton-drive-sync/install.ps1 | iex'
+          'Download OpenProtonSync from: https://github.com/Robje007/OpenProtonSync/releases'
         );
       } else {
         logger.error(
-          'Install with: bash <(curl -fsSL https://www.damianb.dev/proton-drive-sync/install.sh)'
+          'Download OpenProtonSync from: https://github.com/Robje007/OpenProtonSync/releases'
         );
       }
       process.exit(1);
@@ -156,7 +156,7 @@ export async function serviceUnloadCommand(scope: InstallScope = 'user'): Promis
     process.exit(1);
   }
   sendSignal('stop');
-  logger.info('Service stopped and unloaded. Run `proton-drive-sync service load` to restart.');
+  logger.info('Service stopped and unloaded. Run `openprotonsync service load` to restart.');
 }
 
 export async function serviceLoadCommand(scope: InstallScope = 'user'): Promise<void> {
@@ -169,7 +169,7 @@ export async function serviceLoadCommand(scope: InstallScope = 'user'): Promise<
 
   const service = await getServiceManager(scope);
   if (!service.isInstalled()) {
-    logger.error('Service is not installed. Run `proton-drive-sync service install` first.');
+    logger.error('Service is not installed. Run `openprotonsync service install` first.');
     process.exit(1);
   }
 

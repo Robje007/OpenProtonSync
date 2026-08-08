@@ -1,20 +1,20 @@
 {
-  "name": "proton-drive-sync",
-  "version": "1.0.0",
+  "name": "openprotonsync",
+  "version": "1.0.1",
   "description": "OpenProtonSync - enhanced Proton Drive sync for Docker and the command line",
   "type": "module",
   "bin": {
-    "proton-drive-sync": "./dist/index.js"
+    "openprotonsync": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc && cp -r src/db/migrations dist/db/ && mkdir -p dist/dashboard && cp src/dashboard/*.html.txt dist/dashboard/ && cp -r src/dashboard/assets src/dashboard/scripts dist/dashboard/",
     "build:css": "bunx @tailwindcss/cli -i ./src/dashboard/styles/input.css -o ./src/dashboard/assets/styles.css --minify",
     "build:check": "tsc --noEmit",
-    "build:bin": "bun build --compile --minify --sourcemap ./src/index.ts --outfile ./dist/proton-drive-sync",
-    "build:bin:darwin-arm64": "bun build --compile --minify --target=bun-darwin-arm64 ./src/index.ts --outfile ./dist/proton-drive-sync-darwin-arm64",
-    "build:bin:darwin-x64": "bun build --compile --minify --target=bun-darwin-x64 ./src/index.ts --outfile ./dist/proton-drive-sync-darwin-x64",
-    "build:bin:linux-x64": "bun build --compile --minify --target=bun-linux-x64 ./src/index.ts --outfile ./dist/proton-drive-sync-linux-x64",
-    "build:bin:windows-x64": "bun build --compile --minify --target=bun-windows-x64 ./src/index.ts --outfile ./dist/proton-drive-sync-windows-x64.exe",
+    "build:bin": "bun build --compile --minify --sourcemap ./src/index.ts --outfile ./dist/openprotonsync",
+    "build:bin:darwin-arm64": "bun build --compile --minify --target=bun-darwin-arm64 ./src/index.ts --outfile ./dist/openprotonsync-darwin-arm64",
+    "build:bin:darwin-x64": "bun build --compile --minify --target=bun-darwin-x64 ./src/index.ts --outfile ./dist/openprotonsync-darwin-x64",
+    "build:bin:linux-x64": "bun build --compile --minify --target=bun-linux-x64 ./src/index.ts --outfile ./dist/openprotonsync-linux-x64",
+    "build:bin:windows-x64": "bun build --compile --minify --target=bun-windows-x64 ./src/index.ts --outfile ./dist/openprotonsync-windows-x64.exe",
     "test": "bun test",
     "prepare": "husky"
   },
@@ -27,7 +27,7 @@
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Robje007/proton-drive-sync"
+    "url": "https://github.com/Robje007/OpenProtonSync"
   },
   "files": [
     "dist"

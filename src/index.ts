@@ -41,7 +41,7 @@ import { unlockCommand } from './cli/unlock.js';
 const { version } = (await import('../package.json')).default;
 
 program
-  .name('proton-drive-sync')
+  .name('openprotonsync')
   .description('OpenProtonSync - sync local files to Proton Drive')
   .version(version);
 
@@ -132,10 +132,7 @@ program
   .description('Start the dashboard server standalone')
   .action(dashboardCommand);
 
-program
-  .command('stop')
-  .description('Stop any running proton-drive-sync process')
-  .action(stopCommand);
+program.command('stop').description('Stop any running openprotonsync process').action(stopCommand);
 
 program
   .command('status')

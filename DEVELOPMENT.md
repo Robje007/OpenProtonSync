@@ -7,8 +7,8 @@
 ## Setup
 
 ```bash
-git clone https://github.com/Robje007/proton-drive-sync
-cd proton-drive-sync
+git clone https://github.com/Robje007/OpenProtonSync
+cd openprotonsync
 make install
 ```
 
@@ -45,7 +45,7 @@ Build and smoke-test the same image used by NAS installations:
 
 ```bash
 sudo docker build -f docker/Dockerfile -t proton-nas-sync:dev .
-sudo docker run --rm --entrypoint proton-drive-sync proton-nas-sync:dev --version
+sudo docker run --rm --entrypoint openprotonsync proton-nas-sync:dev --version
 ```
 
 ## Publishing

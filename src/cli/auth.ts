@@ -145,7 +145,7 @@ export async function createClientFromTokens(
   const creds = credentials as unknown as Record<string, unknown>;
   if (credentials.passwordMode === undefined || creds['parentUID'] || creds['childUID']) {
     throw new Error(
-      'Stored credentials are outdated. Please re-authenticate with: proton-drive-sync auth'
+      'Stored credentials are outdated. Please re-authenticate with: openprotonsync auth'
     );
   }
 

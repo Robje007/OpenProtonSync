@@ -17,9 +17,12 @@ import {
   deleteCredentialsFile,
 } from './keychain-file.js';
 
-const KEYCHAIN_SERVICE = 'proton-drive-sync';
-const KEYCHAIN_ACCOUNT = 'proton-drive-sync:tokens';
-const DEFAULT_KEYRING_PASSWORD = 'proton-drive-sync';
+const KEYCHAIN_SERVICE = 'openprotonsync';
+const KEYCHAIN_ACCOUNT = 'openprotonsync:tokens';
+const DEFAULT_KEYRING_PASSWORD = 'openprotonsync';
+const LEGACY_DEFAULT_KEYRING_PASSWORD = 'proton-drive-sync';
+const LEGACY_KEYCHAIN_SERVICE = 'proton-drive-sync';
+const LEGACY_KEYCHAIN_ACCOUNT = 'proton-drive-sync:tokens';
 
 /**
  * Check if we should use file-based storage.
@@ -58,11 +61,22 @@ export async function getStoredCredentials(): Promise<StoredCredentials | null> 
   try {
     // Linux: use file-based storage
     if (useFileStorage()) {
-      return getCredentialsFromFile(getKeyringPassword()) as StoredCredentials | null;
+      const credentials = getCredentialsFromFile(getKeyringPassword()) as StoredCredentials | null;
+      if (credentials || process.env.KEYRING_PASSWORD) return credentials;
+
+      const legacyCredentials = getCredentialsFromFile(
+        LEGACY_DEFAULT_KEYRING_PASSWORD
+      ) as StoredCredentials | null;
+      if (legacyCredentials) storeCredentialsToFile(legacyCredentials, getKeyringPassword());
+      return legacyCredentials;
     }
 
     // macOS/Windows/Linux desktop: use keytar
-    const data = await keytar.getPassword(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT);
+    let data = await keytar.getPassword(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT);
+    if (!data) {
+      data = await keytar.getPassword(LEGACY_KEYCHAIN_SERVICE, LEGACY_KEYCHAIN_ACCOUNT);
+      if (data) await keytar.setPassword(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT, data);
+    }
     if (!data) return null;
     return JSON.parse(data) as StoredCredentials;
   } catch (error) {
@@ -92,6 +106,7 @@ export async function deleteStoredCredentials(): Promise<void> {
 
     // macOS/Windows/Linux desktop: use keytar
     await keytar.deletePassword(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT);
+    await keytar.deletePassword(LEGACY_KEYCHAIN_SERVICE, LEGACY_KEYCHAIN_ACCOUNT);
   } catch {
     // Ignore - may not exist
   }

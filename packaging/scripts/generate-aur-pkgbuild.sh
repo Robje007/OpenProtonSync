@@ -4,7 +4,7 @@
 #
 # Required environment variables:
 #   VERSION       - Version string (e.g., "0.2.2-beta.2")
-#   PACKAGE_NAME  - AUR package name (e.g., "proton-drive-sync-prerelease-bin")
+#   PACKAGE_NAME  - AUR package name (e.g., "openprotonsync-prerelease-bin")
 #   ARTIFACTS_DIR - Directory containing the Linux tarballs
 #
 # Optional environment variables:
@@ -29,8 +29,8 @@ TEMPLATE_PATH="${SCRIPT_DIR}/../aur/PKGBUILD.template"
 AUR_VERSION="${VERSION//-/}"
 
 # Compute SHA256 checksums
-SHA256_X64=$(sha256sum "${ARTIFACTS_DIR}/proton-drive-sync-linux-x64.tar.gz" | cut -d' ' -f1)
-SHA256_ARM64=$(sha256sum "${ARTIFACTS_DIR}/proton-drive-sync-linux-arm64.tar.gz" | cut -d' ' -f1)
+SHA256_X64=$(sha256sum "${ARTIFACTS_DIR}/openprotonsync-linux-x64.tar.gz" | cut -d' ' -f1)
+SHA256_ARM64=$(sha256sum "${ARTIFACTS_DIR}/openprotonsync-linux-arm64.tar.gz" | cut -d' ' -f1)
 
 echo "Generating PKGBUILD for ${PACKAGE_NAME} v${VERSION} (AUR version: ${AUR_VERSION})"
 echo "  SHA256 x64:   ${SHA256_X64}"

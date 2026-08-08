@@ -101,7 +101,7 @@
       referrerPolicy: 'no-referrer',
       headers: {
         'Content-Type': 'application/json',
-        'X-Proton-Drive-Sync': '1',
+        'X-OpenProtonSync': '1',
       },
       body: JSON.stringify(body),
     });

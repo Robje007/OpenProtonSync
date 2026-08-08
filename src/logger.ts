@@ -1,5 +1,5 @@
 /**
- * Proton Drive Sync - Logger
+ * OpenProtonSync - Logger
  *
  * Logs to both file and console by default.
  * In daemon mode, console logging is disabled.

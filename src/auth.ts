@@ -169,6 +169,7 @@ const API_BASE_URL = 'https://drive-api.proton.me';
 const SRP_LEN = 256; // 2048 / 8, in bytes
 const AUTH_VERSION = 4;
 const BCRYPT_PREFIX = '$2y$10$';
+// Proton API client identifier; this upstream protocol value is not product branding.
 const APP_VERSION = 'external-drive-proton_drive_sync@1.0.0';
 
 // SRP Modulus verification key
@@ -1195,9 +1196,7 @@ export class ProtonAuth {
       return this.session;
     } catch (error) {
       if (this.isInvalidRefreshTokenError(error)) {
-        throw new Error(
-          'Refresh token expired. Please re-authenticate with: proton-drive-sync auth'
-        );
+        throw new Error('Refresh token expired. Please re-authenticate with: openprotonsync auth');
       }
       throw error;
     }

@@ -403,7 +403,7 @@ function listSyncDirs(): void {
 
   if (!config.sync_dirs || config.sync_dirs.length === 0) {
     console.log('No sync directories configured.');
-    console.log('\nAdd one with: proton-drive-sync config sync-dir --add <path>');
+    console.log('\nAdd one with: openprotonsync config sync-dir --add <path>');
     return;
   }
 
@@ -697,7 +697,7 @@ function listExclusions(targetPath: string): void {
     // List all exclusions
     if (patterns.length === 0) {
       console.log('No exclusion patterns configured.');
-      console.log('\nAdd patterns with: proton-drive-sync config exclude --add <pattern>');
+      console.log('\nAdd patterns with: openprotonsync config exclude --add <pattern>');
       return;
     }
 

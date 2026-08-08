@@ -21,9 +21,9 @@ services:
 
     volumes:
       # Persistent config (credentials.enc, config.json)
-      - config:/config/proton-drive-sync
+      - config:/config/openprotonsync
       # Persistent state (state.db, sync.log)
-      - state:/state/proton-drive-sync
+      - state:/state/openprotonsync
       # Host directory mount points - set SYNC_DIR_* in .env to enable
       # - ${SYNC_DIR_1}:/data/documents
       # - ${SYNC_DIR_2}:/data/photos

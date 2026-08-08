@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# Build AppImage package for proton-drive-sync
+# Build AppImage package for openprotonsync
 #
 # Required environment variables:
 #   VERSION     - Package version (e.g., 1.0.0)
@@ -20,9 +20,9 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 # Determine output filename based on prerelease status
 if [ "${PRERELEASE}" = "true" ]; then
-	OUTPUT_NAME="Proton_Drive_Sync-Prerelease-${VERSION}-${ARCH}.AppImage"
+	OUTPUT_NAME="OpenProtonSync-Prerelease-${VERSION}-${ARCH}.AppImage"
 else
-	OUTPUT_NAME="Proton_Drive_Sync-${VERSION}-${ARCH}.AppImage"
+	OUTPUT_NAME="OpenProtonSync-${VERSION}-${ARCH}.AppImage"
 fi
 
 echo "Building AppImage: ${OUTPUT_NAME}"
@@ -33,17 +33,17 @@ rm -rf "${APPDIR}"
 mkdir -p "${APPDIR}/usr/bin"
 
 # Copy binary
-cp "${BINARY_PATH}" "${APPDIR}/usr/bin/proton-drive-sync"
-chmod +x "${APPDIR}/usr/bin/proton-drive-sync"
+cp "${BINARY_PATH}" "${APPDIR}/usr/bin/openprotonsync"
+chmod +x "${APPDIR}/usr/bin/openprotonsync"
 
 # Copy desktop file
-cp "${REPO_ROOT}/packaging/appimage/proton-drive-sync.desktop" "${APPDIR}/proton-drive-sync.desktop"
+cp "${REPO_ROOT}/packaging/appimage/openprotonsync.desktop" "${APPDIR}/openprotonsync.desktop"
 
 # Copy icon
-cp "${REPO_ROOT}/src/dashboard/assets/icon.svg" "${APPDIR}/proton-drive-sync.svg"
+cp "${REPO_ROOT}/src/dashboard/assets/icon.svg" "${APPDIR}/openprotonsync.svg"
 
 # Create AppRun symlink
-ln -sf usr/bin/proton-drive-sync "${APPDIR}/AppRun"
+ln -sf usr/bin/openprotonsync "${APPDIR}/AppRun"
 
 # Download appimagetool if not present
 APPIMAGETOOL="appimagetool-${ARCH}.AppImage"

@@ -10,7 +10,7 @@ import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
 import { dirname, join } from 'path';
 
 import { logger } from './logger.js';
-import { getEffectiveHome, chownToEffectiveUser, ensureDir } from './paths.js';
+import { getConfigDir, chownToEffectiveUser, ensureDir } from './paths.js';
 
 const CREDENTIALS_FILENAME = 'credentials.enc';
 const ALGORITHM = 'aes-256-gcm';
@@ -25,18 +25,10 @@ const PBKDF2_ITERATIONS = 100000;
  *
  * Priority:
  * 1. XDG_CONFIG_HOME env var (set by systemd service to user's config dir)
- * 2. User scope: ~/.config/proton-drive-sync/credentials.enc
+ * 2. User scope: ~/.config/openprotonsync/credentials.enc
  */
 function getCredentialsPath(): string {
-  // Check XDG_CONFIG_HOME first (set by systemd service file for correct user paths)
-  const xdgConfig = process.env.XDG_CONFIG_HOME;
-  if (xdgConfig) {
-    return join(xdgConfig, 'proton-drive-sync', CREDENTIALS_FILENAME);
-  }
-
-  // Default to user scope, respecting SUDO_USER if set
-  const home = getEffectiveHome();
-  return join(home, '.config', 'proton-drive-sync', CREDENTIALS_FILENAME);
+  return join(getConfigDir(), CREDENTIALS_FILENAME);
 }
 
 /**

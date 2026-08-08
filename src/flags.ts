@@ -1,5 +1,5 @@
 /**
- * Proton Drive Sync - Flag Management
+ * OpenProtonSync - Flag Management
  *
  * Flags: Persistent process state (running, paused, etc) stored in SQLite.
  */
@@ -184,7 +184,7 @@ function isRunLockOwnerAlive(value: string): boolean {
   if (process.platform === 'linux') {
     try {
       const commandLine = readFileSync(`/proc/${lock.pid}/cmdline`, 'utf8');
-      return commandLine.includes('proton-drive-sync');
+      return commandLine.includes('openprotonsync');
     } catch {
       return false;
     }
@@ -194,7 +194,7 @@ function isRunLockOwnerAlive(value: string): boolean {
 }
 
 /**
- * Check if a proton-drive-sync process is currently running.
+ * Check if a openprotonsync process is currently running.
  */
 export function isAlreadyRunning(): boolean {
   const lockValue = getFlagData(RUNNING_PID_FLAG);
@@ -250,7 +250,7 @@ export function clearStaleRunLock(): boolean {
   const lockValue = getFlagData(RUNNING_PID_FLAG);
   if (!lockValue) return false;
   if (isRunLockOwnerAlive(lockValue)) {
-    throw new Error('Refusing to clear lock: a proton-drive-sync process is still running');
+    throw new Error('Refusing to clear lock: a openprotonsync process is still running');
   }
   clearFlag(RUNNING_PID_FLAG, ALL_VARIANTS);
   clearFlag(FLAGS.STARTUP_READY);

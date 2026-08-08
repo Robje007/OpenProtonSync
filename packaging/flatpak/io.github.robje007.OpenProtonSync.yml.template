@@ -1,0 +1,34 @@
+app-id: io.github.robje007.OpenProtonSync
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: openprotonsync
+
+finish-args:
+  # Network access for Proton API
+  - --share=network
+  # Filesystem access (sync needs to read/write user files)
+  - --filesystem=host
+  # For keytar/libsecret credential storage
+  - --socket=session-bus
+  - --talk-name=org.freedesktop.secrets
+  # Allow flatpak-spawn --host for managing systemd services on the host
+  - --talk-name=org.freedesktop.Flatpak
+
+modules:
+  - name: openprotonsync
+    buildsystem: simple
+    build-options:
+      strip: false
+      no-debuginfo: true
+    build-commands:
+      - install -Dm755 openprotonsync /app/bin/openprotonsync
+      - install -Dm644 io.github.robje007.OpenProtonSync.desktop /app/share/applications/io.github.robje007.OpenProtonSync.desktop
+      - install -Dm644 io.github.robje007.OpenProtonSync.svg /app/share/icons/hicolor/scalable/apps/io.github.robje007.OpenProtonSync.svg
+    sources:
+      - type: file
+        path: openprotonsync
+      - type: file
+        path: io.github.robje007.OpenProtonSync.desktop
+      - type: file
+        path: io.github.robje007.OpenProtonSync.svg

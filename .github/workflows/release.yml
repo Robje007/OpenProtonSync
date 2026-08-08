@@ -40,32 +40,32 @@ jobs:
 
       - name: Build binary (Unix)
         if: runner.os != 'Windows'
-        run: bun build --compile --minify --target=bun-${{ matrix.target }} ./src/index.ts --outfile ./proton-drive-sync
+        run: bun build --compile --minify --target=bun-${{ matrix.target }} ./src/index.ts --outfile ./openprotonsync
 
       - name: Build binary (Windows)
         if: runner.os == 'Windows'
-        run: bun build --compile --minify --target=bun-${{ matrix.target }} ./src/index.ts --outfile ./proton-drive-sync.exe
+        run: bun build --compile --minify --target=bun-${{ matrix.target }} ./src/index.ts --outfile ./openprotonsync.exe
 
       - name: Create tarball (Unix)
         if: runner.os != 'Windows'
-        run: tar -czvf proton-drive-sync-${{ matrix.target }}.tar.gz proton-drive-sync
+        run: tar -czvf openprotonsync-${{ matrix.target }}.tar.gz openprotonsync
 
       - name: Create zip (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: Compress-Archive -Path proton-drive-sync.exe -DestinationPath proton-drive-sync-${{ matrix.target }}.zip
+        run: Compress-Archive -Path openprotonsync.exe -DestinationPath openprotonsync-${{ matrix.target }}.zip
 
       - name: Upload to release (Unix)
         if: runner.os != 'Windows'
         uses: softprops/action-gh-release@v2
         with:
-          files: proton-drive-sync-${{ matrix.target }}.tar.gz
+          files: openprotonsync-${{ matrix.target }}.tar.gz
 
       - name: Upload to release (Windows)
         if: runner.os == 'Windows'
         uses: softprops/action-gh-release@v2
         with:
-          files: proton-drive-sync-${{ matrix.target }}.zip
+          files: openprotonsync-${{ matrix.target }}.zip
 
   package:
     needs: build
@@ -94,23 +94,23 @@ jobs:
           echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
 
           if [ "${{ github.event.release.prerelease }}" = "true" ]; then
-            echo "package_name=proton-drive-sync-prerelease" >> $GITHUB_OUTPUT
+            echo "package_name=openprotonsync-prerelease" >> $GITHUB_OUTPUT
           else
-            echo "package_name=proton-drive-sync" >> $GITHUB_OUTPUT
+            echo "package_name=openprotonsync" >> $GITHUB_OUTPUT
           fi
 
       - name: Download Linux ${{ matrix.arch }} artifact
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           mkdir -p artifacts
-          gh release download "v${VERSION}" -p "proton-drive-sync-linux-${{ matrix.arch }}.tar.gz" -D artifacts/
+          gh release download "v${VERSION}" -p "openprotonsync-linux-${{ matrix.arch }}.tar.gz" -D artifacts/
         env:
           GH_TOKEN: ${{ github.token }}
 
       - name: Extract binary
         run: |
           mkdir -p binaries
-          tar -xzf artifacts/proton-drive-sync-linux-${{ matrix.arch }}.tar.gz -C binaries/
+          tar -xzf artifacts/openprotonsync-linux-${{ matrix.arch }}.tar.gz -C binaries/
 
       - name: Install packaging tools
         run: |
@@ -124,7 +124,7 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
           ARCH: ${{ matrix.deb_arch }}
-          BINARY_PATH: binaries/proton-drive-sync
+          BINARY_PATH: binaries/openprotonsync
           PACKAGE_NAME: ${{ steps.version.outputs.package_name }}
 
       - name: Build .rpm package
@@ -132,7 +132,7 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
           ARCH: ${{ matrix.rpm_arch }}
-          BINARY_PATH: binaries/proton-drive-sync
+          BINARY_PATH: binaries/openprotonsync
           PACKAGE_NAME: ${{ steps.version.outputs.package_name }}
 
       - name: Build AppImage
@@ -140,7 +140,7 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
           ARCH: ${{ matrix.arch == 'x64' && 'x86_64' || 'aarch64' }}
-          BINARY_PATH: binaries/proton-drive-sync
+          BINARY_PATH: binaries/openprotonsync
           PRERELEASE: ${{ github.event.release.prerelease }}
 
       - name: Build Flatpak
@@ -148,7 +148,7 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
           ARCH: ${{ matrix.arch == 'x64' && 'x86_64' || 'aarch64' }}
-          BINARY_PATH: binaries/proton-drive-sync
+          BINARY_PATH: binaries/openprotonsync
           PRERELEASE: ${{ github.event.release.prerelease }}
 
       - name: Upload packages to release
@@ -157,8 +157,8 @@ jobs:
           gh release upload "v${VERSION}" \
             ${{ steps.version.outputs.package_name }}_${VERSION}_${{ matrix.deb_arch }}.deb \
             ${{ steps.version.outputs.package_name }}-*.${{ matrix.rpm_arch }}.rpm \
-            Proton_Drive_Sync*.AppImage \
-            Proton_Drive_Sync*.flatpak
+            OpenProtonSync*.AppImage \
+            OpenProtonSync*.flatpak
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -190,19 +190,6 @@ jobs:
           GEMFURY_TOKEN: ${{ secrets.GEMFURY_TOKEN }}
           PACKAGES_DIR: packages
 
-  update-homebrew:
-    needs: package
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Trigger Homebrew tap update
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.TAP_UPDATE_TOKEN }}
-          repository: DamianB-BitFlipper/homebrew-tap
-          event-type: update-formula
-          client-payload: '{"version": "${{ github.event.release.tag_name }}", "prerelease": ${{ github.event.release.prerelease }}}'
-
   update-nix-flake:
     needs: package
     runs-on: ubuntu-latest
@@ -225,10 +212,10 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           mkdir -p artifacts
           gh release download "v${VERSION}" \
-            -p "proton-drive-sync-linux-x64.tar.gz" \
-            -p "proton-drive-sync-linux-arm64.tar.gz" \
-            -p "proton-drive-sync-darwin-arm64.tar.gz" \
-            -p "proton-drive-sync-darwin-x64.tar.gz" \
+            -p "openprotonsync-linux-x64.tar.gz" \
+            -p "openprotonsync-linux-arm64.tar.gz" \
+            -p "openprotonsync-darwin-arm64.tar.gz" \
+            -p "openprotonsync-darwin-x64.tar.gz" \
             -D artifacts/
         env:
           GH_TOKEN: ${{ github.token }}
@@ -254,10 +241,10 @@ jobs:
       matrix:
         include:
           - prerelease: true
-            pkgname: proton-drive-sync-prerelease-bin
+            pkgname: openprotonsync-prerelease-bin
             pkgdesc: 'Sync local directories to Proton Drive cloud storage (prerelease)'
           - prerelease: false
-            pkgname: proton-drive-sync-bin
+            pkgname: openprotonsync-bin
             pkgdesc: 'Sync local directories to Proton Drive cloud storage'
 
     steps:
@@ -286,8 +273,8 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           mkdir -p artifacts
           gh release download "v${VERSION}" \
-            -p "proton-drive-sync-linux-x64.tar.gz" \
-            -p "proton-drive-sync-linux-arm64.tar.gz" \
+            -p "openprotonsync-linux-x64.tar.gz" \
+            -p "openprotonsync-linux-arm64.tar.gz" \
             -D artifacts/
         env:
           GH_TOKEN: ${{ github.token }}

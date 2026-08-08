@@ -66,18 +66,18 @@ function showSection(title: string): void {
 function getInstalledServiceScope(): InstallScope | null {
   if (process.platform === 'linux') {
     // Check system-level first (more specific)
-    if (existsSync('/etc/systemd/system/proton-drive-sync.service')) {
+    if (existsSync('/etc/systemd/system/openprotonsync.service')) {
       return 'system';
     }
     // Check user-level
     const home = getEffectiveHome();
-    if (existsSync(`${home}/.config/systemd/user/proton-drive-sync.service`)) {
+    if (existsSync(`${home}/.config/systemd/user/openprotonsync.service`)) {
       return 'user';
     }
   } else if (process.platform === 'darwin') {
     // macOS only has user-level LaunchAgents
     const home = getEffectiveHome();
-    if (existsSync(`${home}/Library/LaunchAgents/com.damianb-bitflipper.proton-drive-sync.plist`)) {
+    if (existsSync(`${home}/Library/LaunchAgents/com.robje007.openprotonsync.plist`)) {
       return 'user';
     }
   }
@@ -200,8 +200,8 @@ async function configureService(): Promise<boolean> {
 
     if (choice === 'none') {
       logger.info('Skipping automatic startup.');
-      logger.info('You can start manually with: proton-drive-sync start');
-      logger.info('You can enable it later with: proton-drive-sync service install');
+      logger.info('You can start manually with: openprotonsync start');
+      logger.info('You can enable it later with: openprotonsync service install');
       return false;
     } else if (choice === 'system') {
       // System-level install requires root - re-exec with sudo if not already root
@@ -239,8 +239,8 @@ async function configureService(): Promise<boolean> {
 
     if (choice === 'none') {
       logger.info('Skipping automatic startup.');
-      logger.info('You can start manually with: proton-drive-sync start');
-      logger.info('You can enable it later with: proton-drive-sync service install');
+      logger.info('You can start manually with: openprotonsync start');
+      logger.info('You can enable it later with: openprotonsync service install');
       return false;
     } else {
       await serviceInstallCommand(true, 'user');
@@ -250,7 +250,7 @@ async function configureService(): Promise<boolean> {
 
   // Unsupported platform (Windows, etc.)
   logger.info('Automatic service installation is not available on this platform.');
-  logger.info('You can start manually with: proton-drive-sync start');
+  logger.info('You can start manually with: openprotonsync start');
   return false;
 }
 
@@ -331,7 +331,7 @@ async function waitForServiceAndOpenDashboard(): Promise<void> {
     console.log('');
   } else {
     logger.warn('Service did not start within 30 seconds.');
-    logger.info('Check logs with: proton-drive-sync logs');
+    logger.info('Check logs with: openprotonsync logs');
   }
 }
 
@@ -364,7 +364,7 @@ export async function setupCommand(): Promise<void> {
     showSection('Setup Complete');
     console.log('  To start syncing, run:');
     console.log('');
-    console.log('    proton-drive-sync start');
+    console.log('    openprotonsync start');
     console.log('');
     console.log('  Then visit the dashboard to configure sync directories:');
     console.log('');

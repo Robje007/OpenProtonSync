@@ -35,10 +35,10 @@ sri_hash() {
 
 echo "Computing hashes for v${VERSION}..."
 
-HASH_LINUX_X64=$(sri_hash "${ARTIFACTS_DIR}/proton-drive-sync-linux-x64.tar.gz")
-HASH_LINUX_ARM64=$(sri_hash "${ARTIFACTS_DIR}/proton-drive-sync-linux-arm64.tar.gz")
-HASH_DARWIN_ARM64=$(sri_hash "${ARTIFACTS_DIR}/proton-drive-sync-darwin-arm64.tar.gz")
-HASH_DARWIN_X64=$(sri_hash "${ARTIFACTS_DIR}/proton-drive-sync-darwin-x64.tar.gz")
+HASH_LINUX_X64=$(sri_hash "${ARTIFACTS_DIR}/openprotonsync-linux-x64.tar.gz")
+HASH_LINUX_ARM64=$(sri_hash "${ARTIFACTS_DIR}/openprotonsync-linux-arm64.tar.gz")
+HASH_DARWIN_ARM64=$(sri_hash "${ARTIFACTS_DIR}/openprotonsync-darwin-arm64.tar.gz")
+HASH_DARWIN_X64=$(sri_hash "${ARTIFACTS_DIR}/openprotonsync-darwin-x64.tar.gz")
 
 echo "  x86_64-linux:   ${HASH_LINUX_X64}"
 echo "  aarch64-linux:  ${HASH_LINUX_ARM64}"

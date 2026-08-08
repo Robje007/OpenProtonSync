@@ -1,5 +1,5 @@
 /**
- * Proton Drive Sync - Cross-platform Path Helpers
+ * OpenProtonSync - Cross-platform Path Helpers
  *
  * Provides consistent paths across macOS, Linux, and Windows:
  * - macOS/Linux: Uses XDG Base Directory specification
@@ -10,7 +10,7 @@
  * - Files created are chowned to the original user
  */
 
-import { chownSync, existsSync, mkdirSync } from 'fs';
+import { chownSync, cpSync, existsSync, mkdirSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 
@@ -39,6 +39,22 @@ function getLogger() {
  */
 const DEFAULT_UID = 1000;
 const DEFAULT_GID = 1000;
+const APP_DIRECTORY_NAME = 'openprotonsync';
+const LEGACY_APP_DIRECTORY_NAME = 'proton-drive-sync';
+
+/** Copy legacy data once so upgrades continue with the renamed application directories. */
+function resolveRenamedDirectory(parent: string): string {
+  const target = join(parent, APP_DIRECTORY_NAME);
+  const legacy = join(parent, LEGACY_APP_DIRECTORY_NAME);
+  if (!existsSync(target) && existsSync(legacy)) {
+    try {
+      cpSync(legacy, target, { recursive: true, errorOnExist: false });
+    } catch (error) {
+      getLogger()?.warn(`Could not migrate legacy data from ${legacy}: ${String(error)}`);
+    }
+  }
+  return target;
+}
 
 // ============================================================================
 // SUDO_USER Awareness Helpers
@@ -152,8 +168,8 @@ export function ensureDir(dir: string): void {
 
 /**
  * Get the configuration directory path.
- * - macOS/Linux: ~/.config/proton-drive-sync
- * - Windows: %APPDATA%\proton-drive-sync
+ * - macOS/Linux: ~/.config/openprotonsync
+ * - Windows: %APPDATA%\openprotonsync
  *
  * Respects SUDO_USER on Linux/macOS when running via sudo.
  */
@@ -163,7 +179,7 @@ export function getConfigDir(): string {
     if (!appData) {
       throw new Error('APPDATA environment variable is not set');
     }
-    return join(appData, 'proton-drive-sync');
+    return resolveRenamedDirectory(appData);
   }
 
   // macOS/Linux: Use XDG Base Directory
@@ -173,7 +189,7 @@ export function getConfigDir(): string {
   if (sudoUser) {
     const home = getEffectiveHome();
     const xdgConfigHome = process.env.XDG_CONFIG_HOME || join(home, '.config');
-    return join(xdgConfigHome, 'proton-drive-sync');
+    return resolveRenamedDirectory(xdgConfigHome);
   }
 
   // Normal case: use xdg-basedir
@@ -182,13 +198,13 @@ export function getConfigDir(): string {
   if (!xdgConfig) {
     throw new Error('Could not determine XDG config directory');
   }
-  return join(xdgConfig, 'proton-drive-sync');
+  return resolveRenamedDirectory(xdgConfig);
 }
 
 /**
  * Get the state directory path (for database, logs, etc.).
- * - macOS/Linux: ~/.local/state/proton-drive-sync
- * - Windows: %LOCALAPPDATA%\proton-drive-sync
+ * - macOS/Linux: ~/.local/state/openprotonsync
+ * - Windows: %LOCALAPPDATA%\openprotonsync
  *
  * Respects SUDO_USER on Linux/macOS when running via sudo.
  */
@@ -198,7 +214,7 @@ export function getStateDir(): string {
     if (!localAppData) {
       throw new Error('LOCALAPPDATA environment variable is not set');
     }
-    return join(localAppData, 'proton-drive-sync');
+    return resolveRenamedDirectory(localAppData);
   }
 
   // macOS/Linux: Use XDG Base Directory
@@ -207,7 +223,7 @@ export function getStateDir(): string {
   if (sudoUser) {
     const home = getEffectiveHome();
     const xdgStateHome = process.env.XDG_STATE_HOME || join(home, '.local', 'state');
-    return join(xdgStateHome, 'proton-drive-sync');
+    return resolveRenamedDirectory(xdgStateHome);
   }
 
   // Normal case: use xdg-basedir
@@ -216,5 +232,5 @@ export function getStateDir(): string {
   if (!xdgState) {
     throw new Error('Could not determine XDG state directory');
   }
-  return join(xdgState, 'proton-drive-sync');
+  return resolveRenamedDirectory(xdgState);
 }

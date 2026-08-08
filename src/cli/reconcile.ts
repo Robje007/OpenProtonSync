@@ -9,7 +9,7 @@ import { logger } from '../logger.js';
 export async function reconcileCommand(): Promise<void> {
   // Check if daemon is running
   if (!isAlreadyRunning()) {
-    logger.error('No running daemon found. Start the daemon first with: proton-drive-sync start');
+    logger.error('No running daemon found. Start the daemon first with: openprotonsync start');
     process.exit(1);
   }
 
