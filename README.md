@@ -1,14 +1,22 @@
-# Proton Drive Sync
+# OpenProtonSync
 
 [![Support on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/robje007)
 
-An unofficial Proton Drive sync client for local computers, home servers, NAS systems, and Docker.
-It includes a web dashboard, safe upload-only mappings, and an opt-in **two-way sync beta**.
+**OpenProtonSync** is a substantially enhanced fork of
+[proton-drive-sync](https://github.com/DamianB-BitFlipper/proton-drive-sync), built for local
+computers, home servers, NAS systems, and Docker. It adds bug fixes, a richer web dashboard,
+safer backup controls, and an opt-in **two-way sync beta**.
 
-> This community project is not affiliated with or endorsed by Proton AG. Two-way sync is beta and
-> should first be tested with a small, backed-up folder.
+> OpenProtonSync is an independent GPL-3.0 fork. Credit for the original project goes to the
+> [proton-drive-sync contributors](https://github.com/DamianB-BitFlipper/proton-drive-sync/graphs/contributors).
+> It is not affiliated with or endorsed by Proton AG. Please report OpenProtonSync issues in
+> [this repository](https://github.com/Robje007/proton-drive-sync/issues), not to the upstream project.
 
-If Proton Drive Sync is useful to you, you can [support its development on Ko-fi](https://ko-fi.com/robje007).
+If OpenProtonSync is useful to you, you can [support its development on Ko-fi](https://ko-fi.com/robje007).
+
+The existing `proton-drive-sync` command, package names, container image, and configuration paths
+are retained for backwards-compatible upgrades. OpenProtonSync is the product name shown in the
+documentation and interface.
 
 ## Features
 

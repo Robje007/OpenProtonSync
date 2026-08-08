@@ -701,7 +701,7 @@ app.use('*', async (c, next) => {
     ? verifyDashboardPassword(credentials.password, auth.password_hash)
     : false;
   if (!usernameMatches || !passwordMatches) {
-    c.header('WWW-Authenticate', 'Basic realm="Proton Drive Sync", charset="UTF-8"');
+    c.header('WWW-Authenticate', 'Basic realm="OpenProtonSync", charset="UTF-8"');
     c.header('Cache-Control', 'no-store');
     return c.text('Authentication required', 401);
   }
@@ -894,7 +894,7 @@ app.get('/', async (c) => {
     );
 
   const html = await composePage(layout, homeContent, {
-    title: 'Proton Drive Sync',
+    title: 'OpenProtonSync',
     activeTab: 'home',
     pageScripts: homeScriptsHtml,
   });
@@ -948,7 +948,7 @@ app.get('/controls', async (c) => {
   }
 
   const html = await composePage(layout, content, {
-    title: 'Controls - Proton Drive Sync',
+    title: 'Controls - OpenProtonSync',
     activeTab: 'controls',
     pageScripts: controlsScriptsWithValues(
       isOnboarding,
@@ -976,7 +976,7 @@ app.get('/about', async (c) => {
   content = content.replace('{{HIDE_START_BUTTON}}', showStartButton ? '' : 'hidden');
 
   const html = await composePage(layout, content, {
-    title: 'About - Proton Drive Sync',
+    title: 'About - OpenProtonSync',
     activeTab: 'about',
     pageScripts: aboutScriptsHtml,
   });

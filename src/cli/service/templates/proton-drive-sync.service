@@ -1,5 +1,5 @@
 [Unit]
-Description=Proton Drive Sync
+Description=OpenProtonSync
 After=network-online.target
 Wants=network-online.target
 

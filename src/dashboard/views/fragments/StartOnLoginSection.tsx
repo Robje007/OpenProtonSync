@@ -53,7 +53,7 @@ export const StartOnLoginSection: FC<Props> = ({ enabled, managedByDocker = fals
           <div class="relative group flex items-center">
             <Icon name="info" class="w-4 h-4 text-gray-500 cursor-help" />
             <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-xs text-gray-300 w-72 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-              When enabled, Proton Drive Sync will automatically start when you log in.
+              When enabled, OpenProtonSync will automatically start when you log in.
             </div>
           </div>
         </div>

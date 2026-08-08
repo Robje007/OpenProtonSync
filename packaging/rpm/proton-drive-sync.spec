@@ -6,15 +6,15 @@
 Name:           %{_name}
 Version:        %{_version}
 Release:        %{_release}
-Summary:        Sync local directories to Proton Drive cloud storage
+Summary:        OpenProtonSync - sync local directories to Proton Drive
 License:        GPL-3.0
-URL:            https://github.com/DamianB-BitFlipper/proton-drive-sync
+URL:            https://github.com/Robje007/proton-drive-sync
 Requires:       libsecret
 Conflicts:      proton-drive-sync, proton-drive-sync-prerelease
 Provides:       proton-drive-sync-cli
 
 %description
-A CLI tool that syncs local directories to Proton Drive using
+An enhanced CLI tool that syncs local directories to Proton Drive using
 the official Proton Drive SDK.
 
 %install

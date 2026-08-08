@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Proton Drive Sync
+Name=OpenProtonSync
 Comment=Sync local directories to Proton Drive cloud storage
 Exec=proton-drive-sync
 Icon=io.github.damianbbitflipper.ProtonDriveSync

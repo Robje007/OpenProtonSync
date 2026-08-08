@@ -44,7 +44,7 @@
           inherit version;
 
           src = pkgs.fetchurl {
-            url = "https://github.com/DamianB-BitFlipper/proton-drive-sync/releases/download/v${version}/proton-drive-sync-${target}.tar.gz";
+            url = "https://github.com/Robje007/proton-drive-sync/releases/download/v${version}/proton-drive-sync-${target}.tar.gz";
             hash = hashes.${system};
           };
 
@@ -80,7 +80,7 @@
 
           meta = with pkgs.lib; {
             description = "Sync local directories to Proton Drive cloud storage";
-            homepage = "https://github.com/DamianB-BitFlipper/proton-drive-sync";
+            homepage = "https://github.com/Robje007/proton-drive-sync";
             license = licenses.gpl3Only;
             maintainers = [ ];
             platforms = supportedSystems;
