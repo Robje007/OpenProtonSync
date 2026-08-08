@@ -1,7 +1,7 @@
 <script>
   let syncDirs = {{SYNC_DIRS_JSON}};
-  const initialExcludePatterns = {{EXCLUDE_PATTERNS_JSON}};
-  const initialSyncDirPaths = new Set(syncDirs.map((dir) => dir.source_path));
+  let savedExcludePatterns = {{EXCLUDE_PATTERNS_JSON}};
+  let savedSyncDirPaths = new Set(syncDirs.map((dir) => dir.source_path));
   let originalConfig = { sync_concurrency: {{SYNC_CONCURRENCY}}, sync_dirs: syncDirs };
   const redirectAfterSave = '{{REDIRECT_AFTER_SAVE}}';
   const dashboardAuthEnabled = {{DASHBOARD_AUTH_ENABLED}};
@@ -247,7 +247,7 @@
             <label class="block text-xs text-gray-500 mb-1">Exclude folders/files</label>
             <textarea
               rows="2"
-              onchange="updateSyncDir(${index}, 'exclude_globs', this.value)"
+              oninput="updateSyncDir(${index}, 'exclude_globs', this.value)"
               placeholder="private&#10;*.tmp&#10;**/*.raw"
               class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-proton"
             >${escapeHtml((dir.exclude_globs || []).join('\n'))}</textarea>
@@ -320,8 +320,8 @@
         sync_mode: d.sync_mode === 'two_way' ? 'two_way' : 'upload',
       })),
       exclude_patterns: [
-        ...initialExcludePatterns.filter(
-          (entry) => entry.path === '/' || !initialSyncDirPaths.has(entry.path)
+        ...savedExcludePatterns.filter(
+          (entry) => entry.path === '/' || !savedSyncDirPaths.has(entry.path)
         ),
         ...validDirs
           .filter((d) => (d.exclude_globs || []).length > 0)
@@ -341,7 +341,13 @@
       if (result.success) {
         // Update local state
         originalConfig = JSON.parse(JSON.stringify(config));
-        syncDirs = config.sync_dirs.length > 0 ? config.sync_dirs : [];
+        savedExcludePatterns = result.config.exclude_patterns || [];
+        savedSyncDirPaths = new Set(result.config.sync_dirs.map((dir) => dir.source_path));
+        syncDirs = result.config.sync_dirs.map((dir) => ({
+          ...dir,
+          exclude_globs:
+            savedExcludePatterns.find((entry) => entry.path === dir.source_path)?.globs || [],
+        }));
         renderSyncDirs();
 
         showToast('Config updated', 'success');
@@ -362,6 +368,15 @@
   // Listen for dir-added event from HTMX to sync JS state
   document.body.addEventListener('dir-added', function (e) {
     syncDirs = e.detail.dirs;
+    savedSyncDirPaths = new Set(syncDirs.map((dir) => dir.source_path));
+    savedExcludePatterns = [
+      ...savedExcludePatterns.filter(
+        (entry) => entry.path === '/' || !savedSyncDirPaths.has(entry.path)
+      ),
+      ...syncDirs
+        .filter((dir) => (dir.exclude_globs || []).length > 0)
+        .map((dir) => ({ path: dir.source_path, globs: dir.exclude_globs })),
+    ];
     // Hide no-dirs message if we have dirs
     const noMessage = document.getElementById('no-dirs-message');
     if (syncDirs.length > 0) {
