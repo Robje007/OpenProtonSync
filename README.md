@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="readme_assets/openprotonsync-header.png" alt="OpenProtonSync — Reliable Proton Drive backup and sync" width="100%">
+</p>
+
 # OpenProtonSync
 
 [![Support on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/robje007)
