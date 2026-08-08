@@ -1,6 +1,6 @@
 {
   "name": "openprotonsync",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "OpenProtonSync - enhanced Proton Drive sync for Docker and the command line",
   "type": "module",
   "bin": {
