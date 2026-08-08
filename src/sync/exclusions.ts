@@ -5,7 +5,7 @@
  * Supports simple globs: * (any chars except /), ** (any path), ? (single char)
  */
 
-import { relative } from 'path';
+import { isAbsolute, relative, resolve } from 'path';
 
 import type { ExcludePattern } from '../config.js';
 
@@ -155,10 +155,12 @@ export function isPathExcluded(
   for (const entry of excludePatterns) {
     // Check if this entry applies to the current path
     // "/" applies to all paths, otherwise check if absolutePath is under entry.path
+    const entryPath = entry.path === '/' ? '/' : resolve(entry.path);
+    const relativeToEntry = entry.path === '/' ? '' : relative(entryPath, resolve(absolutePath));
     const applies =
       entry.path === '/' ||
-      absolutePath.startsWith(entry.path + '/') ||
-      absolutePath === entry.path;
+      relativeToEntry === '' ||
+      (!relativeToEntry.startsWith('..') && !isAbsolute(relativeToEntry));
 
     if (!applies) {
       continue;
@@ -167,7 +169,7 @@ export function isPathExcluded(
     // Check each glob in this entry
     for (const glob of entry.globs) {
       const regex = getCachedRegex(glob);
-      if (regex.test(relativePath)) {
+      if (regex.test(normalizedRelativePath)) {
         return true;
       }
     }

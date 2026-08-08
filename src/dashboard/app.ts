@@ -14,6 +14,7 @@ import { createInterface } from 'readline';
 import { dirname, join } from 'path';
 import { xdgState } from 'xdg-basedir';
 import { EventEmitter } from 'events';
+import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
 import {
   getJobCounts,
   getRecentJobs,
@@ -33,6 +34,7 @@ import { ProtonAuth, initCrypto } from '../auth.js';
 import { storeCredentials } from '../keychain.js';
 import type { ApiError } from '../proton/types.js';
 import { findOverlappingSyncDir, normalizeLocalRoot, normalizeRemoteRoot } from '../sync/paths.js';
+import { validateGlob } from '../sync/exclusions.js';
 import {
   WebAuthRateLimiter,
   accessTokenMatches,
@@ -497,7 +499,14 @@ function escapeHtml(text: string): string {
 }
 
 /** Render sync directories HTML for SSR */
-function renderSyncDirsHtml(dirs: Config['sync_dirs']): string {
+function scopedExclusions(config: Config | null, sourcePath: string): string[] {
+  return config?.exclude_patterns.find((entry) => entry.path === sourcePath)?.globs ?? [];
+}
+
+function renderSyncDirsHtml(
+  dirs: Config['sync_dirs'],
+  config: Config | null = currentConfig
+): string {
   return dirs
     .map(
       (dir, index) => `
@@ -540,6 +549,16 @@ function renderSyncDirsHtml(dirs: Config['sync_dirs']): string {
               placeholder="/"
               class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-proton"
             />
+          </div>
+          <div class="lg:col-span-3">
+            <label class="block text-xs text-gray-500 mb-1">Exclude folders/files</label>
+            <textarea
+              rows="2"
+              onchange="updateSyncDir(${index}, 'exclude_globs', this.value)"
+              placeholder="private&#10;*.tmp&#10;**/*.raw"
+              class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-proton"
+            >${escapeHtml(scopedExclusions(config, dir.source_path).join('\n'))}</textarea>
+            <p class="mt-1 text-xs text-gray-500">One relative glob per line; only for this mapping.</p>
           </div>
         </div>
         <button
@@ -640,6 +659,55 @@ export function renderFragment(key: FragmentKey, s: DashboardSnapshot): string {
 const app = new Hono();
 let isDryRun = false;
 
+function hashDashboardPassword(password: string): string {
+  const salt = randomBytes(16);
+  const hash = scryptSync(password, salt, 32);
+  return `scrypt$${salt.toString('hex')}$${hash.toString('hex')}`;
+}
+
+function verifyDashboardPassword(password: string, storedHash: string): boolean {
+  const [algorithm, saltHex, hashHex] = storedHash.split('$');
+  if (algorithm !== 'scrypt' || !saltHex || !hashHex) return false;
+  try {
+    const expected = Buffer.from(hashHex, 'hex');
+    const actual = scryptSync(password, Buffer.from(saltHex, 'hex'), expected.length);
+    return expected.length > 0 && timingSafeEqual(actual, expected);
+  } catch {
+    return false;
+  }
+}
+
+function parseBasicCredentials(
+  header: string | undefined
+): { username: string; password: string } | null {
+  if (!header?.startsWith('Basic ')) return null;
+  try {
+    const decoded = Buffer.from(header.slice(6), 'base64').toString('utf8');
+    const separator = decoded.indexOf(':');
+    if (separator < 0) return null;
+    return { username: decoded.slice(0, separator), password: decoded.slice(separator + 1) };
+  } catch {
+    return null;
+  }
+}
+
+app.use('*', async (c, next) => {
+  const auth = currentConfig?.dashboard_auth;
+  if (!auth) return next();
+
+  const credentials = parseBasicCredentials(c.req.header('Authorization'));
+  const usernameMatches = credentials?.username === auth.username;
+  const passwordMatches = credentials
+    ? verifyDashboardPassword(credentials.password, auth.password_hash)
+    : false;
+  if (!usernameMatches || !passwordMatches) {
+    c.header('WWW-Authenticate', 'Basic realm="Proton Drive Sync", charset="UTF-8"');
+    c.header('Cache-Control', 'no-store');
+    return c.text('Authentication required', 401);
+  }
+  return next();
+});
+
 function getWebAuthRequestInfo(request: Request): WebAuthRequestInfo {
   const headers = request.headers;
   return {
@@ -704,14 +772,30 @@ function webAuthErrorMessage(): string {
 /** Get controls scripts with all values injected */
 function controlsScriptsWithValues(
   isOnboarding: boolean,
-  syncDirs: Array<{ source_path: string; remote_root?: string }>,
+  syncDirs: Config['sync_dirs'],
+  excludePatterns: Config['exclude_patterns'],
   syncConcurrency: number
 ): string {
   const redirectUrl = isOnboarding ? '/about' : '';
   return controlsScriptsHtml
     .replace('{{REDIRECT_AFTER_SAVE}}', redirectUrl)
-    .replace('{{SYNC_DIRS_JSON}}', JSON.stringify(syncDirs))
+    .replace(
+      '{{SYNC_DIRS_JSON}}',
+      JSON.stringify(
+        syncDirs.map((dir) => ({
+          ...dir,
+          exclude_globs:
+            excludePatterns.find((entry) => entry.path === dir.source_path)?.globs ?? [],
+        }))
+      )
+    )
+    .replace('{{EXCLUDE_PATTERNS_JSON}}', JSON.stringify(excludePatterns))
     .replace('{{SYNC_CONCURRENCY}}', String(syncConcurrency))
+    .replace('{{DASHBOARD_AUTH_ENABLED}}', currentConfig?.dashboard_auth ? 'true' : 'false')
+    .replace(
+      '{{DASHBOARD_AUTH_USERNAME}}',
+      JSON.stringify(currentConfig?.dashboard_auth?.username ?? '')
+    )
     .replace('{{ICON_INFO_SMALL}}', icon('info', 'w-3 h-3 text-gray-500 cursor-help').toString())
     .replace('{{ICON_TRASH}}', icon('trash-2', 'w-5 h-5').toString());
 }
@@ -866,7 +950,12 @@ app.get('/controls', async (c) => {
   const html = await composePage(layout, content, {
     title: 'Controls - Proton Drive Sync',
     activeTab: 'controls',
-    pageScripts: controlsScriptsWithValues(isOnboarding, syncDirs, syncConcurrency),
+    pageScripts: controlsScriptsWithValues(
+      isOnboarding,
+      syncDirs,
+      currentConfig?.exclude_patterns ?? defaultConfig.exclude_patterns,
+      syncConcurrency
+    ),
   });
   return c.html(html);
 });
@@ -1115,6 +1204,8 @@ app.post('/api/config', async (c) => {
       ...currentConfig,
       ...body,
     };
+    // Dashboard credentials may only be changed through the dedicated validated endpoint.
+    newConfig.dashboard_auth = currentConfig?.dashboard_auth;
 
     // Validate
     if (!Array.isArray(newConfig.sync_dirs)) {
@@ -1124,6 +1215,22 @@ app.post('/api/config', async (c) => {
       return c.json({ error: 'sync_concurrency must be a positive number' }, 400);
     }
     newConfig.sync_dirs = normalizeSyncDirs(newConfig.sync_dirs);
+    if (!Array.isArray(newConfig.exclude_patterns)) {
+      return c.json({ error: 'exclude_patterns must be an array' }, 400);
+    }
+    for (const entry of newConfig.exclude_patterns) {
+      if (!entry || typeof entry.path !== 'string' || !Array.isArray(entry.globs)) {
+        return c.json({ error: 'Invalid exclusion configuration' }, 400);
+      }
+      entry.path = entry.path === '/' ? '/' : normalizeLocalRoot(entry.path);
+      for (const glob of entry.globs) {
+        if (typeof glob !== 'string') {
+          return c.json({ error: 'Exclusion patterns must be strings' }, 400);
+        }
+        const result = validateGlob(glob);
+        if (!result.valid) throw new Error(`Invalid exclusion "${glob}": ${result.error}`);
+      }
+    }
 
     // Write to config file
     await Bun.write(CONFIG_FILE, JSON.stringify(newConfig, null, 2));
@@ -1144,6 +1251,49 @@ app.post('/api/config', async (c) => {
   }
 });
 
+app.post('/api/dashboard-auth', async (c) => {
+  try {
+    const body = (await c.req.json()) as {
+      enabled?: boolean;
+      username?: string;
+      password?: string;
+    };
+    const enabled = body.enabled === true;
+    const username = body.username?.trim() ?? '';
+    const password = body.password ?? '';
+
+    if (enabled && username.length < 3) {
+      return c.json({ error: 'Username must contain at least 3 characters' }, 400);
+    }
+    if (enabled && !currentConfig?.dashboard_auth && password.length < 12) {
+      return c.json({ error: 'Password must contain at least 12 characters' }, 400);
+    }
+    if (enabled && password && password.length < 12) {
+      return c.json({ error: 'New password must contain at least 12 characters' }, 400);
+    }
+
+    const newConfig: Config = {
+      ...defaultConfig,
+      ...currentConfig,
+      dashboard_auth: enabled
+        ? {
+            username,
+            password_hash: password
+              ? hashDashboardPassword(password)
+              : currentConfig!.dashboard_auth!.password_hash,
+          }
+        : undefined,
+    };
+    await Bun.write(CONFIG_FILE, JSON.stringify(newConfig, null, 2));
+    chownToEffectiveUser(CONFIG_FILE);
+    currentConfig = newConfig;
+    sendSignal(CONFIG_CHECK_SIGNAL);
+    return c.json({ success: true, enabled, username });
+  } catch (err) {
+    return c.json({ error: (err as Error).message }, 500);
+  }
+});
+
 /** Add a single directory via modal form and return updated list */
 app.post('/api/add-directory', async (c) => {
   try {
@@ -1151,6 +1301,10 @@ app.post('/api/add-directory', async (c) => {
     const sourcePathInput = ((formData.source_path as string) || '').trim();
     const remoteRootInput = ((formData.remote_root as string) || '/').trim();
     const syncModeInput = ((formData.sync_mode as string) || 'upload').trim();
+    const excludeGlobs = ((formData.exclude_globs as string) || '')
+      .split(/\r?\n/)
+      .map((glob) => glob.trim())
+      .filter(Boolean);
 
     // Validate source_path is provided
     if (!sourcePathInput) {
@@ -1166,6 +1320,10 @@ app.post('/api/add-directory', async (c) => {
     const remoteRoot = normalizeRemoteRoot(remoteRootInput);
     if (syncModeInput !== 'upload' && syncModeInput !== 'two_way') {
       throw new Error(`Invalid sync mode: ${syncModeInput}`);
+    }
+    for (const glob of excludeGlobs) {
+      const result = validateGlob(glob);
+      if (!result.valid) throw new Error(`Invalid exclusion "${glob}": ${result.error}`);
     }
 
     // Validate local path exists on filesystem (works for both files and directories)
@@ -1209,6 +1367,10 @@ app.post('/api/add-directory', async (c) => {
       ...defaultConfig,
       ...currentConfig,
       sync_dirs: [...existingDirs, newDir],
+      exclude_patterns: [
+        ...(currentConfig?.exclude_patterns ?? defaultConfig.exclude_patterns),
+        ...(excludeGlobs.length > 0 ? [{ path: sourcePath, globs: excludeGlobs }] : []),
+      ],
     };
 
     // Write to config file
@@ -1220,10 +1382,15 @@ app.post('/api/add-directory', async (c) => {
     sendSignal(CONFIG_CHECK_SIGNAL);
 
     // Return updated list HTML + trigger events to close modal, sync JS state, and show toast
-    const html = renderSyncDirsHtml(newConfig.sync_dirs);
+    const html = renderSyncDirsHtml(newConfig.sync_dirs, newConfig);
     return c.html(html, 200, {
       'HX-Trigger': JSON.stringify({
-        'dir-added': { dirs: newConfig.sync_dirs },
+        'dir-added': {
+          dirs: newConfig.sync_dirs.map((dir) => ({
+            ...dir,
+            exclude_globs: scopedExclusions(newConfig, dir.source_path),
+          })),
+        },
         'close-modal': true,
         showToast: { message: 'Config updated', type: 'success' },
       }),

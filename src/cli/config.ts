@@ -555,7 +555,7 @@ interface ExcludeOptions {
  * Exclude subcommand handler - manage file exclusion patterns
  */
 export async function excludeCommand(options: ExcludeOptions): Promise<void> {
-  const targetPath = options.path ?? '/';
+  const targetPath = options.path && options.path !== '/' ? normalizeLocalRoot(options.path) : '/';
 
   // Handle --list
   if (options.list) {
@@ -618,9 +618,13 @@ async function excludeInteractive(): Promise<void> {
     }
 
     if (action === 'add') {
-      const path = await input({
-        message: 'Path (/ for global, or specific path):',
-        default: '/',
+      const syncDirs = ((config.sync_dirs as SyncDir[]) ?? []).map((dir) => ({
+        name: `${dir.source_path} -> ${dir.remote_root || '/'}`,
+        value: normalizeLocalRoot(dir.source_path),
+      }));
+      const path = await select({
+        message: 'Apply this exclusion to:',
+        choices: [{ name: 'All backup mappings (global)', value: '/' }, ...syncDirs],
       });
 
       const pattern = await input({

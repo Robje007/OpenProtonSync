@@ -1,7 +1,11 @@
 <script>
   let syncDirs = {{SYNC_DIRS_JSON}};
+  const initialExcludePatterns = {{EXCLUDE_PATTERNS_JSON}};
+  const initialSyncDirPaths = new Set(syncDirs.map((dir) => dir.source_path));
   let originalConfig = { sync_concurrency: {{SYNC_CONCURRENCY}}, sync_dirs: syncDirs };
   const redirectAfterSave = '{{REDIRECT_AFTER_SAVE}}';
+  const dashboardAuthEnabled = {{DASHBOARD_AUTH_ENABLED}};
+  const dashboardAuthUsername = {{DASHBOARD_AUTH_USERNAME}};
 
   // Icons rendered server-side (using backticks to allow single quotes in SVG attributes)
   const ICON_INFO = `{{ICON_INFO_SMALL}}`;
@@ -9,6 +13,37 @@
 
   let webAuthChallengeId = null;
   let webAuthStep = null;
+
+  const dashboardAuthForm = document.getElementById('dashboard-auth-form');
+  const dashboardAuthEnabledInput = document.getElementById('dashboard-auth-enabled');
+  const dashboardAuthUsernameInput = document.getElementById('dashboard-auth-username');
+  const dashboardAuthPasswordInput = document.getElementById('dashboard-auth-password');
+  dashboardAuthEnabledInput.checked = dashboardAuthEnabled;
+  dashboardAuthUsernameInput.value = dashboardAuthUsername;
+  dashboardAuthForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const enabled = dashboardAuthEnabledInput.checked;
+    const response = await fetch('/api/dashboard-auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        enabled,
+        username: dashboardAuthUsernameInput.value,
+        password: dashboardAuthPasswordInput.value,
+      }),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      showToast(result.error || 'Failed to update dashboard security', 'error', 5000);
+      return;
+    }
+    dashboardAuthPasswordInput.value = '';
+    showToast(
+      enabled ? 'Dashboard protection enabled; sign in on the next request' : 'Dashboard protection disabled',
+      'success',
+      5000
+    );
+  });
 
   function webAuthElements() {
     return {
@@ -208,6 +243,16 @@
               class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-proton"
             />
           </div>
+          <div class="lg:col-span-3">
+            <label class="block text-xs text-gray-500 mb-1">Exclude folders/files</label>
+            <textarea
+              rows="2"
+              onchange="updateSyncDir(${index}, 'exclude_globs', this.value)"
+              placeholder="private&#10;*.tmp&#10;**/*.raw"
+              class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-proton"
+            >${escapeHtml((dir.exclude_globs || []).join('\n'))}</textarea>
+            <p class="mt-1 text-xs text-gray-500">One relative glob per line; only for this mapping.</p>
+          </div>
         </div>
         <button
           onclick="removeSyncDir(${index})"
@@ -236,6 +281,10 @@
   }
 
   function updateSyncDir(index, field, value) {
+    if (field === 'exclude_globs') {
+      syncDirs[index].exclude_globs = value.split(/\r?\n/).map((glob) => glob.trim()).filter(Boolean);
+      return;
+    }
     if (field === 'sync_mode' && value === 'two_way') {
       const accepted = confirm(
         'Two-way sync is beta. Remote changes will be downloaded to this local folder. Conflicts and deletes are preserved in a recovery folder. Continue?'
@@ -270,6 +319,14 @@
         remote_root: d.remote_root?.trim() || '',
         sync_mode: d.sync_mode === 'two_way' ? 'two_way' : 'upload',
       })),
+      exclude_patterns: [
+        ...initialExcludePatterns.filter(
+          (entry) => entry.path === '/' || !initialSyncDirPaths.has(entry.path)
+        ),
+        ...validDirs
+          .filter((d) => (d.exclude_globs || []).length > 0)
+          .map((d) => ({ path: d.source_path.trim(), globs: d.exclude_globs })),
+      ],
     };
 
     try {
