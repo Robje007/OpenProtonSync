@@ -76,8 +76,8 @@ export const CONFIG_CHECK_SIGNAL = 'config:check';
 /** Default sync concurrency */
 export const DEFAULT_SYNC_CONCURRENCY = 4;
 
-/** Generated dependency/cache directories that are unsafe to scan by default. */
-export const DEFAULT_EXCLUDE_GLOBS = [
+/** Defaults added automatically by earlier OpenProtonSync releases. */
+const LEGACY_DEFAULT_EXCLUDE_GLOBS = [
   'node_modules',
   '.npm',
   '.pnpm-store',
@@ -103,7 +103,7 @@ export const defaultConfig: Config = {
   remote_delete_behavior: DEFAULT_REMOTE_DELETE_BEHAVIOR,
   dashboard_host: DEFAULT_DASHBOARD_HOST,
   dashboard_port: DEFAULT_DASHBOARD_PORT,
-  exclude_patterns: [{ path: '/', globs: [...DEFAULT_EXCLUDE_GLOBS] }],
+  exclude_patterns: [],
 };
 
 const CONFIG_DIR = getConfigDir();
@@ -182,9 +182,19 @@ function parseConfig(throwOnError: boolean): Config | null {
       return null;
     }
 
-    // Default exclude_patterns if not set. Existing explicit configurations are preserved.
+    // User-configurable exclusions start empty. Remove the exact automatically generated list
+    // written by earlier OpenProtonSync releases, while preserving every customized list.
     if (config.exclude_patterns === undefined) {
-      config.exclude_patterns = [{ path: '/', globs: [...DEFAULT_EXCLUDE_GLOBS] }];
+      config.exclude_patterns = [];
+    } else if (
+      config.exclude_patterns.length === 1 &&
+      config.exclude_patterns[0].path === '/' &&
+      config.exclude_patterns[0].globs.length === LEGACY_DEFAULT_EXCLUDE_GLOBS.length &&
+      config.exclude_patterns[0].globs.every(
+        (glob, index) => glob === LEGACY_DEFAULT_EXCLUDE_GLOBS[index]
+      )
+    ) {
+      config.exclude_patterns = [];
     }
 
     // Validate all sync_dirs entries
