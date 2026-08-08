@@ -1,10 +1,12 @@
+name: openprotonsync
+
 services:
-  proton-drive-sync:
+  openprotonsync:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: ghcr.io/robje007/proton-drive-sync:latest
-    container_name: proton-drive-sync
+    image: ghcr.io/robje007/openprotonsync:latest
+    container_name: openprotonsync
     restart: unless-stopped
 
     environment:

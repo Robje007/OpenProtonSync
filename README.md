@@ -42,13 +42,13 @@ openssl rand -base64 32
 Paste that key directly into this Compose configuration—no separate `.env` file is required:
 
 ```yaml
-name: proton-drive-sync
+name: openprotonsync
 
 services:
-  proton-drive-sync:
-    image: ghcr.io/robje007/proton-drive-sync:latest
+  openprotonsync:
+    image: ghcr.io/robje007/openprotonsync:latest
     pull_policy: always
-    container_name: proton-drive-sync
+    container_name: openprotonsync
     restart: unless-stopped
 
     environment:
@@ -60,16 +60,21 @@ services:
       - '4242:4242'
 
     volumes:
-      - proton-drive-config:/config/proton-drive-sync
-      - proton-drive-state:/state/proton-drive-sync
+      - openprotonsync-config:/config/proton-drive-sync
+      - openprotonsync-state:/state/proton-drive-sync
       - /path/on/your/host:/data/files
 
     stop_grace_period: 30s
 
 volumes:
-  proton-drive-config:
-  proton-drive-state:
+  openprotonsync-config:
+  openprotonsync-state:
 ```
+
+The `/config/proton-drive-sync` and `/state/proton-drive-sync` paths inside the container are
+intentional compatibility paths. Existing installations should keep their current named volumes or
+migrate their data before adopting the new `openprotonsync-*` volume names. The legacy
+`ghcr.io/robje007/proton-drive-sync` image remains published as an alias for upgrades.
 
 Keep `KEYRING_PASSWORD` unchanged after authentication. Anyone who can read the Compose YAML can
 read this key, so restrict access to the configuration and never commit it.
@@ -78,8 +83,8 @@ Start the container:
 
 ```bash
 sudo docker compose up -d
-sudo docker exec -it proton-drive-sync proton-drive-sync auth
-sudo docker logs --tail 100 -f proton-drive-sync
+sudo docker exec -it openprotonsync proton-drive-sync auth
+sudo docker logs --tail 100 -f openprotonsync
 ```
 
 The service notices saved authentication automatically; a restart after `auth` is not required.
@@ -97,7 +102,7 @@ Use the path **inside the container**. With `/path/on/your/host:/data/files`, th
 Authentication is performed in the CLI, not on the normal dashboard page. For Docker, run:
 
 ```bash
-sudo docker exec -it proton-drive-sync proton-drive-sync auth
+sudo docker exec -it openprotonsync proton-drive-sync auth
 ```
 
 For a native installation, run:
@@ -123,7 +128,7 @@ re-authenticate. To sign out and remove the stored session, run:
 
 ```bash
 # Docker
-sudo docker exec -it proton-drive-sync proton-drive-sync auth --logout
+sudo docker exec -it openprotonsync proton-drive-sync auth --logout
 
 # Native installation
 proton-drive-sync auth --logout
@@ -146,7 +151,7 @@ a direction remain upload-only after upgrading.
 For a new native or Docker CLI mapping, add `--two-way`:
 
 ```bash
-sudo docker exec proton-drive-sync proton-drive-sync config sync-dir \
+sudo docker exec openprotonsync proton-drive-sync config sync-dir \
   --add /data/files --remote /Backups --two-way
 ```
 
@@ -174,7 +179,7 @@ image upgrade preserves them:
 ```bash
 sudo docker compose pull
 sudo docker compose up -d
-sudo docker logs --tail 100 -f proton-drive-sync
+sudo docker logs --tail 100 -f openprotonsync
 ```
 
 Do **not** run `sudo docker compose down -v`; `-v` deletes the named volumes. Also keep the existing
@@ -183,28 +188,28 @@ Do **not** run `sudo docker compose down -v`; `-v` deletes the named volumes. Al
 To confirm the running image:
 
 ```bash
-sudo docker inspect proton-drive-sync --format '{{.Config.Image}}'
-sudo docker exec proton-drive-sync proton-drive-sync --version
+sudo docker inspect openprotonsync --format '{{.Config.Image}}'
+sudo docker exec openprotonsync proton-drive-sync --version
 ```
 
 ## Useful Docker commands
 
 ```bash
 # Show mappings
-sudo docker exec proton-drive-sync proton-drive-sync config sync-dir --list
+sudo docker exec openprotonsync proton-drive-sync config sync-dir --list
 
 # Show exclusions
-sudo docker exec proton-drive-sync proton-drive-sync config exclude --list
+sudo docker exec openprotonsync proton-drive-sync config exclude --list
 
 # Authenticate again
-sudo docker exec -it proton-drive-sync proton-drive-sync auth
+sudo docker exec -it openprotonsync proton-drive-sync auth
 
 # Safely clear a verified stale process lock
-sudo docker exec proton-drive-sync proton-drive-sync unlock
+sudo docker exec openprotonsync proton-drive-sync unlock
 
 # Restart and follow logs
-sudo docker restart proton-drive-sync
-sudo docker logs --tail 100 -f proton-drive-sync
+sudo docker restart openprotonsync
+sudo docker logs --tail 100 -f openprotonsync
 ```
 
 ## Optional dashboard sign-in
