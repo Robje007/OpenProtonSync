@@ -17,6 +17,29 @@ If OpenProtonSync is useful to you, you can [support its development on Ko-fi](h
 The application, CLI, packages, container image, services, and configuration paths all use the
 OpenProtonSync name.
 
+## OpenProtonSync compared with proton-drive-sync
+
+OpenProtonSync keeps the original project's Proton Drive synchronization foundation, but is
+developed and released independently. The table below summarizes the user-facing differences in
+this fork; it is not intended as criticism of, or a compatibility promise for, future upstream
+versions.
+
+| Area                           | proton-drive-sync                                                      | OpenProtonSync                                                                                                     |
+| ------------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Project and support            | Original upstream project                                              | Independent fork with its own releases and [issue tracker](https://github.com/Robje007/OpenProtonSync/issues)      |
+| Product identity               | `proton-drive-sync` CLI, packages, container, and data paths           | `openprotonsync` CLI, packages, container, and data paths                                                          |
+| Synchronization                | Provides the original local-to-Proton Drive synchronization foundation | Adds upload-only backup or an opt-in two-way sync beta per mapping                                                 |
+| Mapping exclusions             | Original mapping configuration                                         | Adds per-mapping folder and file exclusions in both the dashboard and interactive CLI                              |
+| Web interface security         | Local dashboard                                                        | Adds optional username/password protection for dashboard pages, assets, event streams, and API endpoints           |
+| Conflict and recovery handling | Original queue and synchronization behavior                            | Adds atomic downloads, conflict copies in `.proton-sync-conflicts`, and recovery copies in `.proton-sync-recovery` |
+| Reliability                    | Upstream implementation                                                | Includes additional authentication, queue recovery, Windows path matching, and reconciliation fixes                |
+| Upgrade path                   | Uses the original configuration, state, and credential locations       | Uses separate OpenProtonSync locations and automatically migrates legacy native-installation data on first launch  |
+| Docker image                   | Upstream image and `proton-drive-sync` service naming                  | `ghcr.io/robje007/openprotonsync` with OpenProtonSync service, container, volume, and internal path naming         |
+
+Because these are separate projects, commands, images, packages, documentation, and bug reports
+should use the repository that matches the installed application. See the migration notes below
+before replacing an existing Docker deployment.
+
 ## Features
 
 - Upload-only backup or two-way beta, selectable per folder mapping.
