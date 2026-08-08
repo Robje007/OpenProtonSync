@@ -1,5 +1,5 @@
 /**
- * Proton Drive Sync CLI
+ * OpenProtonSync CLI
  */
 
 // Set NODE_ENV to production before any imports to suppress OpenPGP.js debug output.
@@ -40,7 +40,10 @@ import { unlockCommand } from './cli/unlock.js';
 
 const { version } = (await import('../package.json')).default;
 
-program.name('proton-drive-sync').description('Sync local files to Proton Drive').version(version);
+program
+  .name('proton-drive-sync')
+  .description('OpenProtonSync - sync local files to Proton Drive')
+  .version(version);
 
 program
   .option('--debug', 'Enable debug logging')

@@ -8,7 +8,7 @@ Conflicts: proton-drive-sync, proton-drive-sync-prerelease
 Replaces: proton-drive-sync, proton-drive-sync-prerelease
 Provides: proton-drive-sync-cli
 Maintainer: dbctl@pm.me
-Description: Sync local directories to Proton Drive cloud storage
- A CLI tool that syncs local directories to Proton Drive using
+Description: OpenProtonSync - sync local directories to Proton Drive
+ An enhanced CLI tool that syncs local directories to Proton Drive using
  the official Proton Drive SDK.
-Homepage: https://github.com/DamianB-BitFlipper/proton-drive-sync
+Homepage: https://github.com/Robje007/proton-drive-sync

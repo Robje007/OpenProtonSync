@@ -34,7 +34,7 @@ export const WelcomeModal: FC = () => {
 
         {/* Title */}
         <h2 class="text-2xl text-white text-center mb-3">
-          Welcome to <span class="font-bold">Proton Drive Sync</span>
+          Welcome to <span class="font-bold">OpenProtonSync</span>
         </h2>
 
         {/* Description */}

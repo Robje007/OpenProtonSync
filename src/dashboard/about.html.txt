@@ -3,17 +3,17 @@
     class="rounded-2xl border border-indigo-400/20 bg-gradient-to-br from-indigo-500/15 to-slate-900 p-8"
   >
     <div class="mb-6 flex items-center gap-4">
-      <img src="/assets/icon.svg" alt="Proton Drive Sync" class="h-16 w-16 rounded-2xl" />
+      <img src="/assets/icon.svg" alt="OpenProtonSync" class="h-16 w-16 rounded-2xl" />
       <div>
         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">
           Community project
         </p>
-        <h1 class="mt-1 text-3xl font-semibold text-white">Proton Drive Sync</h1>
+        <h1 class="mt-1 text-3xl font-semibold text-white">OpenProtonSync</h1>
       </div>
     </div>
     <p class="max-w-2xl text-sm leading-6 text-slate-300">
-      An unofficial Proton Drive sync client for local computers, servers, NAS systems, and Docker,
-      with restart-safe queues, bounded scans, and a live dashboard.
+      A substantially enhanced Proton Drive sync client for local computers, servers, NAS systems,
+      and Docker, with restart-safe queues, bounded scans, and a live dashboard.
     </p>
   </section>
 
@@ -31,8 +31,8 @@
     <section class="rounded-2xl border border-white/8 bg-white/4 p-6">
       <h2 class="text-lg font-semibold text-white">Open source</h2>
       <p class="mt-4 text-sm leading-6 text-slate-400">
-        Community-maintained and distributed under GPL-3.0. This project is not affiliated with or
-        endorsed by Proton AG.
+        Community-maintained and distributed under GPL-3.0. OpenProtonSync is a fork of the original
+        proton-drive-sync project and is not affiliated with or endorsed by Proton AG.
       </p>
       <div class="mt-5 flex flex-wrap gap-3">
         <a
@@ -42,6 +42,14 @@
           class="inline-flex rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-cyan-300 transition hover:bg-white/5"
         >
           View source on GitHub
+        </a>
+        <a
+          href="https://github.com/DamianB-BitFlipper/proton-drive-sync"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/5"
+        >
+          Original upstream project
         </a>
       </div>
     </section>
