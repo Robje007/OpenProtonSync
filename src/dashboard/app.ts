@@ -554,7 +554,7 @@ function renderSyncDirsHtml(
             <label class="block text-xs text-gray-500 mb-1">Exclude folders/files</label>
             <textarea
               rows="2"
-              onchange="updateSyncDir(${index}, 'exclude_globs', this.value)"
+              oninput="updateSyncDir(${index}, 'exclude_globs', this.value)"
               placeholder="private&#10;*.tmp&#10;**/*.raw"
               class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-proton"
             >${escapeHtml(scopedExclusions(config, dir.source_path).join('\n'))}</textarea>
