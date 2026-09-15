@@ -55,9 +55,7 @@ async function createProtonDriveClientFromSession(
     httpClient,
     entitiesCache: new sdk.MemoryCache(),
     cryptoCache: new sdk.MemoryCache(),
-    // @ts-expect-error - PrivateKey types differ between openpgp imports
     account,
-    // @ts-expect-error - PrivateKey types differ between openpgp imports
     openPGPCryptoModule,
     srpModule: srpModuleInstance,
     telemetry,

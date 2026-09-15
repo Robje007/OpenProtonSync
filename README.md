@@ -55,7 +55,7 @@ before replacing an existing Docker deployment.
 - Per-mapping folder and file exclusions, editable from both the dashboard and interactive CLI.
 - User-controlled exclusion patterns for large generated directories such as `node_modules`.
 - Docker images for AMD64 and ARM64, plus native CLI support.
-- Official `@protontech/drive-sdk` 0.19.2 integration.
+- Official `@protontech/drive-sdk` 0.21.1 integration.
 
 ## Docker quick start
 
@@ -195,9 +195,11 @@ The first two-way scan is deliberately conservative:
 After inspecting a conflict, keep the desired file at its normal path and edit or replace it once;
 that intentional local change is then uploaded.
 
-The beta is built on the official SDK's download and Drive-event APIs. Proton currently labels its
-SDK as not generally available for third-party production applications, so keep another backup of
-important data and expect beta behavior to evolve.
+Two-way sync is OpenProtonSync's own beta implementation, built on the official SDK's download
+and Drive-event APIs. Upgrading the SDK does not make this sync engine production-stable. Proton
+still describes the SDK as not ready for third-party production use; its separate high-level
+Sync module is listed as coming soon. See the [SDK upgrade notes](docs/sdk-0.21-upgrade.md) for
+upstream changes, compatibility details and validation limits.
 
 ## Upgrade without losing configuration
 

@@ -1,0 +1,64 @@
+diff --git a/src/pmcrypto/openpgp.ts b/src/pmcrypto/openpgp.ts
+index 923c953e9ba2881fd52e976a593bf66208159565..d2b4360fdfeb3728ff77a6d66b1103b6315683fe 100644
+--- a/src/pmcrypto/openpgp.ts
++++ b/src/pmcrypto/openpgp.ts
+@@ -1,4 +1,4 @@
+-import { config } from "openpgp/lightweight";
++import { config } from "openpgp";
+ 
+ export const setConfig = () => {
+     config.s2kIterationCountByte = 255;
+@@ -34,4 +34,4 @@ export const setConfig = () => {
+     config.maxArgon2MemoryExponent = 20;
+ };
+ 
+-export * from "openpgp/lightweight";
++export * from "openpgp";
+diff --git a/src/pmcrypto/pmcrypto.d.ts b/src/pmcrypto/pmcrypto.d.ts
+index 82052deea448f3d6f17561335fcc2a2a0ffc6062..1da4e0bcc457450727af920106f5b94440fd90cc 100644
+--- a/src/pmcrypto/pmcrypto.d.ts
++++ b/src/pmcrypto/pmcrypto.d.ts
+@@ -23,7 +23,7 @@ import {
+     readPrivateKey,
+     type PartialConfig,
+     type AlgorithmInfo,
+-} from "openpgp/lightweight";
++} from "openpgp";
+ 
+ import { VERIFICATION_STATUS, SIGNATURE_TYPES } from "./constants.ts";
+ import type {
+diff --git a/src/pmcrypto/utils.ts b/src/pmcrypto/utils.ts
+index 0c89770b81685854d7e0019879feb52cfef3c125..5b48db4b75617b590495c4e27e30021b5a62b902 100644
+--- a/src/pmcrypto/utils.ts
++++ b/src/pmcrypto/utils.ts
+@@ -26,7 +26,7 @@ export function streamedUtf8StringToUint8Array(
+             cancel() {
+                 return reader.cancel();
+             },
+-        });
++        }) as unknown as WebStream<Uint8Array<ArrayBuffer>>;
+ 
+     return transformedStream;
+ }
+@@ -59,7 +59,7 @@ export function streamedUint8ArrayToUtf8String(
+         cancel() {
+             return reader.cancel();
+         },
+-    });
++    }) as unknown as WebStream<string>;
+ 
+     return transformedStream;
+ }
+diff --git a/src/proxy/endpoint/api.ts b/src/proxy/endpoint/api.ts
+index 339cf0b471cbea710d413495097515af02ea0b38..d179aeec85820332a03060a42fbce8e9417edf12 100644
+--- a/src/proxy/endpoint/api.ts
++++ b/src/proxy/endpoint/api.ts
+@@ -1282,7 +1282,7 @@ export class Api extends KeyManagementApi {
+                             controller.enqueue(await unsafeSHA1(binaryDataStream));
+                             controller.close();
+                         }
+-                    })
++                    }) as unknown as WebStream<Uint8Array<ArrayBuffer>>
+                 }
+             }
+             default:
