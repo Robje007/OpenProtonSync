@@ -1,7 +1,7 @@
 /**
  * Compatibility boundary for the official SDK.
  *
- * SDK 0.19 returns NodeEntity directly and wraps encrypted fields in Result,
+ * SDK 0.21 returns NodeEntity and its active revision directly,
  * while the original application used the pre-0.19 result-shaped API. Keeping
  * that translation here avoids spreading SDK internals throughout the sync
  * engine and gives future SDK upgrades one small, testable boundary.
@@ -18,7 +18,11 @@ function unwrapResult<T>(result: { ok: true; value: T } | { ok: false; error: un
 }
 
 function adaptNode(node: SdkNode): NodeData {
-  const revision = node.activeRevision?.ok ? node.activeRevision.value : undefined;
+  // An incomplete listing must never be interpreted as remote deletions by two-way sync.
+  if (node.errors?.length) {
+    throw new Error('Could not read remote node metadata', { cause: node.errors[0] });
+  }
+  const revision = node.activeRevision;
   const activeRevision: RevisionData | undefined = revision
     ? {
         uid: revision.uid,
@@ -42,7 +46,7 @@ function adaptNode(node: SdkNode): NodeData {
     type: node.type,
     mediaType: node.mediaType,
     isShared: node.isShared,
-    isSharedPublicly: node.isSharedPublicly,
+    isSharedPublicly: node.isSharedByUrl,
     creationTime: node.creationTime,
     trashTime: node.trashTime,
     totalStorageSize: node.totalStorageSize,

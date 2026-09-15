@@ -34,8 +34,8 @@
   ],
   "dependencies": {
     "@inquirer/prompts": "^8.0.1",
-    "@protontech/crypto": "2.0.0",
-    "@protontech/drive-sdk": "0.19.2",
+    "@protontech/crypto": "2.1.3",
+    "@protontech/drive-sdk": "0.21.1",
     "bcryptjs": "^3.0.3",
     "chokidar": "^5.0.0",
     "commander": "^14.0.2",
@@ -63,5 +63,8 @@
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0"
+  },
+  "patchedDependencies": {
+    "@protontech/crypto@2.1.3": "patches/@protontech%2Fcrypto@2.1.3.patch"
   }
 }

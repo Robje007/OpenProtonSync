@@ -9,6 +9,7 @@ WORKDIR /app
 
 # Install dependencies first (better layer caching)
 COPY package.json bun.lock ./
+COPY patches ./patches
 RUN bun install --frozen-lockfile
 
 # Copy source and build

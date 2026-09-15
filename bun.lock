@@ -6,8 +6,8 @@
       "name": "openprotonsync",
       "dependencies": {
         "@inquirer/prompts": "^8.0.1",
-        "@protontech/crypto": "2.0.0",
-        "@protontech/drive-sdk": "0.19.2",
+        "@protontech/crypto": "2.1.3",
+        "@protontech/drive-sdk": "0.21.1",
         "bcryptjs": "^3.0.3",
         "chokidar": "^5.0.0",
         "commander": "^14.0.2",
@@ -37,6 +37,9 @@
         "typescript-eslint": "^8.48.0",
       },
     },
+  },
+  "patchedDependencies": {
+    "@protontech/crypto@2.1.3": "patches/@protontech%2Fcrypto@2.1.3.patch",
   },
   "packages": {
     "@colors/colors": ["@colors/colors@1.6.0", "", {}, "sha512-Ir+AOibqzrIsL6ajt3Rz3LskB7OiMVHqltZmspbW/TJuTVuyOMirVqAkjfY6JISiLHgyNqicAC8AyHHGzNd/dA=="],
@@ -169,9 +172,9 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@noble/hashes": ["@noble/hashes@2.2.0", "", {}, "sha512-IYqDGiTXab6FniAgnSdZwgWbomxpy9FtYvLKs7wCUs2a8RkITG+DFGO1DM9cr+E3/RgADRpFjrKVaJ1z6sjtEg=="],
+    "@noble/hashes": ["@noble/hashes@2.4.0", "", {}, "sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA=="],
 
-    "@openpgp/web-stream-tools": ["@openpgp/web-stream-tools@0.1.3", "", { "peerDependencies": { "typescript": ">=4.2" }, "optionalPeers": ["typescript"] }, "sha512-mT/ds43cH6c+AO5RFpxs+LkACr7KjC3/dZWHrP6KPrWJu4uJ/XJ+p7telaoYiqUfdjiiIvdNSOfhezW9fkmboQ=="],
+    "@openpgp/web-stream-tools": ["@openpgp/web-stream-tools@0.3.1", "", { "peerDependencies": { "@types/node": ">=18.0.0", "typescript": ">=4.7" }, "optionalPeers": ["@types/node", "typescript"] }, "sha512-EV+VQ4Dr8b+JmlGnc74FLgx7EhLyydOr4j6s6Hp+2scQh6sLQMs2h+1oEYUIslXcQPicWKG5ZQx+/dua0dgPWA=="],
 
     "@parcel/watcher": ["@parcel/watcher@2.5.1", "", { "dependencies": { "detect-libc": "^1.0.3", "is-glob": "^4.0.3", "micromatch": "^4.0.5", "node-addon-api": "^7.0.0" }, "optionalDependencies": { "@parcel/watcher-android-arm64": "2.5.1", "@parcel/watcher-darwin-arm64": "2.5.1", "@parcel/watcher-darwin-x64": "2.5.1", "@parcel/watcher-freebsd-x64": "2.5.1", "@parcel/watcher-linux-arm-glibc": "2.5.1", "@parcel/watcher-linux-arm-musl": "2.5.1", "@parcel/watcher-linux-arm64-glibc": "2.5.1", "@parcel/watcher-linux-arm64-musl": "2.5.1", "@parcel/watcher-linux-x64-glibc": "2.5.1", "@parcel/watcher-linux-x64-musl": "2.5.1", "@parcel/watcher-win32-arm64": "2.5.1", "@parcel/watcher-win32-ia32": "2.5.1", "@parcel/watcher-win32-x64": "2.5.1" } }, "sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg=="],
 
@@ -203,9 +206,9 @@
 
     "@pkgr/core": ["@pkgr/core@0.2.9", "", {}, "sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA=="],
 
-    "@protontech/crypto": ["@protontech/crypto@2.0.0", "", { "dependencies": { "@noble/hashes": "^2.0.1", "@openpgp/web-stream-tools": "~0.1.3", "bcryptjs": "^3.0.3", "comlink": "^4.4.2", "core-js": "^3.49.0", "jsmimeparser": "npm:@protontech/jsmimeparser@^3.0.2", "openpgp": "npm:@protontech/openpgp@~6.3.1-0" } }, "sha512-D3M023jLq/aMNCSr5p1KVlLV0grAeVXpUh8WyN2HITCIX83KLJo5BReNbVT1mXMvodPf/qYIxUoYXyaEW3pfOQ=="],
+    "@protontech/crypto": ["@protontech/crypto@2.1.3", "", { "dependencies": { "@noble/hashes": "^2.3.0", "@openpgp/web-stream-tools": "~0.3.1", "bcryptjs": "^3.0.3", "comlink": "^4.4.2", "core-js": "^3.50.0", "openpgp": "npm:@protontech/openpgp@~6.3.1" } }, "sha512-Sbf/7yqwIE40L7AzZvRPfCWvDaHJ3GzELF3BhvhoVpGPImUxkbjRsJscGq/+Amglh3zAWaN1z2mCPoC1uUl2ZA=="],
 
-    "@protontech/drive-sdk": ["@protontech/drive-sdk@0.19.2", "", { "dependencies": { "@noble/hashes": "^1.8.0", "ttag": "^1.8.7" }, "peerDependencies": { "@protontech/crypto": "^2.0.0" } }, "sha512-Vj/vVhZkIUSwBIxdhBlZca+Cga7ZnCyZ0LgJ5jt5yEIlcfrc2Oh7mgOGKzlQd2qb5ecVAymbQ15C+6c0tzt0rw=="],
+    "@protontech/drive-sdk": ["@protontech/drive-sdk@0.21.1", "", { "dependencies": { "@noble/hashes": "^1.8.0", "ttag": "^1.8.7" }, "optionalDependencies": { "@xmldom/xmldom": "^0.9.12", "exifreader": "^4.44.0" }, "peerDependencies": { "@protontech/crypto": "^2.0.0" } }, "sha512-bRD/nC40Qddh0wWchClwxO3xf8OBI8JUjqINTlVLqp8kf6wbO31FGduTfzGNywam6Fn2ViI13T8q9vH4XD+vvg=="],
 
     "@so-ric/colorspace": ["@so-ric/colorspace@1.1.6", "", { "dependencies": { "color": "5.0.3", "text-hex": "1.0.0" } }, "sha512-/KiKkpHNOBgkFJwu9sh48LkHSMYGyuTcSFK/qMBdnOAlrRJzRSXAOFB5qwzaVQuDl8wAvHVMkaASQDReTahxuw=="],
 
@@ -271,6 +274,8 @@
 
     "@typescript-eslint/visitor-keys": ["@typescript-eslint/visitor-keys@8.48.0", "", { "dependencies": { "@typescript-eslint/types": "8.48.0", "eslint-visitor-keys": "4.2.1" } }, "sha512-T0XJMaRPOH3+LBbAfzR2jalckP1MSG/L9eUtY0DEzUyVaXJ/t6zN0nR7co5kz0Jko/nkSYCBRkz1djvjajVTTg=="],
 
+    "@xmldom/xmldom": ["@xmldom/xmldom@0.9.12", "", {}, "sha512-5AXjrcMClTryPe9LgZrygpB1lj7s0S9E0+W+AHaVKAVyHanafK86iPSvG5xHVSp/jC+VH1UXu0TAEmY279xH7A=="],
+
     "acorn": ["acorn@8.15.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg=="],
 
     "acorn-jsx": ["acorn-jsx@5.3.2", "", { "peerDependencies": { "acorn": "8.15.0" } }, "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="],
@@ -333,7 +338,7 @@
 
     "concat-map": ["concat-map@0.0.1", "", {}, "sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg=="],
 
-    "core-js": ["core-js@3.49.0", "", {}, "sha512-es1U2+YTtzpwkxVLwAFdSpaIMyQaq0PBgm3YD1W3Qpsn1NAmO3KSgZfu+oGSWVu6NvLHoHCV/aYcsE5wiB7ALg=="],
+    "core-js": ["core-js@3.50.0", "", {}, "sha512-BRWgOLKkFeCgRudR6zrs8p9XJZcE14grzKMMssoYrk6krtuEZ7MTKPIY5RzOnqsEKIR9kst7wNzphttraT+Yqw=="],
 
     "cross-spawn": ["cross-spawn@7.0.6", "", { "dependencies": { "path-key": "3.1.1", "shebang-command": "2.0.0", "which": "2.0.2" } }, "sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA=="],
 
@@ -386,6 +391,8 @@
     "estraverse": ["estraverse@5.3.0", "", {}, "sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA=="],
 
     "esutils": ["esutils@2.0.3", "", {}, "sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g=="],
+
+    "exifreader": ["exifreader@4.45.0", "", { "optionalDependencies": { "@xmldom/xmldom": "^0.9.10" }, "bin": { "exifreader": "bin/cli.js" } }, "sha512-l9WWwOmPo/RRC3mIdUeAllAA2tGknBrUjOaiMYsekpQnO2BAww7R8YFisGxxJSkWang1UM7nsHxDvD++zsZkpw=="],
 
     "expand-template": ["expand-template@2.0.3", "", {}, "sha512-XYfuKMvj4O35f/pOXLObndIRvyQ+/+6AhODh+OKWj9S9498pHHn/IMszH+gt0fBCRWMNfk1ZSp5x3AifmnI2vg=="],
 
@@ -468,8 +475,6 @@
     "jiti": ["jiti@2.6.1", "", { "bin": { "jiti": "lib/jiti-cli.mjs" } }, "sha512-ekilCSN1jwRvIbgeg/57YFh8qQDNbwDb9xT/qu2DAHbFFZUicIl4ygVaAvzveMhMVr3LnpSKTNnwt8PoOfmKhQ=="],
 
     "js-yaml": ["js-yaml@4.1.1", "", { "dependencies": { "argparse": "2.0.1" }, "bin": { "js-yaml": "bin/js-yaml.js" } }, "sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA=="],
-
-    "jsmimeparser": ["@protontech/jsmimeparser@3.0.2", "", {}, "sha512-PConkdRdY8xc1A8+oEmQ2pGC7nnJPqWwkUb/+odjFPbof2w3zpIws77D9J9assvZg8OdB8dRe/cZdBU+BCijgA=="],
 
     "json-buffer": ["json-buffer@3.0.1", "", {}, "sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ=="],
 
@@ -687,7 +692,7 @@
 
     "@parcel/watcher/node-addon-api": ["node-addon-api@7.1.1", "", {}, "sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ=="],
 
-    "@protontech/crypto/openpgp": ["@protontech/openpgp@6.3.1-0", "", {}, "sha512-TA4wAE86bxYKxrULnnv8Uepu9hKi0e0M/zn4cwiDdgVhEzsqhaKnn3uRSY8Ba9wNcD6gSVALMlUDXdd94k85rA=="],
+    "@protontech/crypto/openpgp": ["@protontech/openpgp@6.3.1", "", { "peerDependencies": { "@openpgp/web-stream-tools": "~0.3.0" }, "optionalPeers": ["@openpgp/web-stream-tools"] }, "sha512-+NUfnF0rbw553xwT09YROb3TBmitumSSgOEx3eQh8LOx7CAKQzo2CLfsbBQz7KFc3+d9iMIMOKLrLzerYCtLIw=="],
 
     "@protontech/drive-sdk/@noble/hashes": ["@noble/hashes@1.8.0", "", {}, "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A=="],
 
