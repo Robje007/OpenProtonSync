@@ -218,6 +218,13 @@
           </button>
         </div>
 
+        <div class="mb-4 p-4 bg-gray-900 border border-gray-700 rounded-lg">
+          <h4 class="text-sm font-medium text-white mb-2">Global exclusions (including configured defaults)</h4>
+          <p class="text-xs text-gray-400 mb-2">These apply to every mapping, in addition to the exclusions entered below.</p>
+          <p class="font-mono text-sm text-gray-300">{{GLOBAL_EXCLUSIONS}}</p>
+          <h4 class="text-sm font-medium text-white mt-2 mb-2">Always excluded for safety</h4>
+          <p class="font-mono text-sm text-gray-300">{{ALWAYS_EXCLUSIONS}}</p>
+        </div>
         <div id="sync-dirs-list" class="space-y-3">{{SYNC_DIRS_HTML}}</div>
 
         <div id="no-dirs-message" class="hidden text-center py-2 text-gray-500">

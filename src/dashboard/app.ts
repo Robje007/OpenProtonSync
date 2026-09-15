@@ -34,7 +34,7 @@ import { ProtonAuth, initCrypto } from '../auth.js';
 import { storeCredentials } from '../keychain.js';
 import type { ApiError } from '../proton/types.js';
 import { findOverlappingSyncDir, normalizeLocalRoot, normalizeRemoteRoot } from '../sync/paths.js';
-import { validateGlob } from '../sync/exclusions.js';
+import { ALWAYS_EXCLUDED_DIRECTORY_NAMES, validateGlob } from '../sync/exclusions.js';
 import {
   WebAuthRateLimiter,
   accessTokenMatches,
@@ -558,7 +558,8 @@ function renderSyncDirsHtml(
               placeholder="private&#10;*.tmp&#10;**/*.raw"
               class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-proton"
             >${escapeHtml(scopedExclusions(config, dir.source_path).join('\n'))}</textarea>
-            <p class="mt-1 text-xs text-gray-500">One relative glob per line; only for this mapping.</p>
+            <p class="mt-1 text-xs text-gray-500">One relative glob per line (e.g. private or *.tmp); only for this mapping. Click Save settings to apply.</p>
+            <button type="button" onclick="saveConfig()" class="mt-2 px-4 py-2 bg-proton hover:bg-proton-dark text-white text-sm font-medium rounded-lg transition-colors">Save settings</button>
           </div>
         </div>
         <button
@@ -928,6 +929,26 @@ app.get('/controls', async (c) => {
   content = content
     .replace(/\{\{SYNC_CONCURRENCY\}\}/g, String(syncConcurrency))
     .replace('{{SYNC_DIRS_HTML}}', syncDirsHtml)
+    .replace(
+      '{{GLOBAL_EXCLUSIONS}}',
+      escapeHtml(
+        (currentConfig?.exclude_patterns ?? defaultConfig.exclude_patterns)
+          .filter((entry) => entry.path === '/')
+          .flatMap((entry) => entry.globs)
+          .join(', ') || 'None configured'
+      )
+    )
+    .replace(
+      '{{ALWAYS_EXCLUSIONS}}',
+      escapeHtml(
+        [
+          ...ALWAYS_EXCLUDED_DIRECTORY_NAMES,
+          '.proton-sync-conflicts',
+          '.proton-sync-recovery',
+          '.proton-sync-tmp',
+        ].join(', ')
+      )
+    )
     // Replace icon placeholders
     .replace('{{ICON_INFO}}', icon('info', 'w-4 h-4 text-gray-500 cursor-help').toString())
     .replace('{{ICON_PLUS}}', icon('plus', 'w-4 h-4').toString())
